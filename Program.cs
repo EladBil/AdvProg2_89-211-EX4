@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Runtime.InteropServices;
 
 
 namespace model
@@ -100,7 +102,93 @@ namespace model
 
     class Model : IModel
     {
+        //the function from dll
+        [DllImport("AP2Libraries.dll")]
+        public static extern IntPtr CreateTs(string name);
+       /// 
+      
+
+        private int millisecondsTimeout = 100;
+        private string nameOfFile = "";
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        ITelnetClient telnetClientFlightGear;
+        volatile Boolean stop;
+        public Model(ITelnetClient telnetClient)
+        {
+            this.telnetClientFlightGear = telnetClient;
+            stop = false;
+           
+        }
+        public void Connect(string ip, int port)
+        {
+            telnetClientFlightGear.Connect(ip, port);
+        }
+        public void Disconnect()
+        {
+            stop = true;
+            telnetClientFlightGear.Disconnect();
+        }
+        public void start()
+        {
+            //need take rows from th eime series wait to shmoel
+           // IntPtr ts = CreateTs(this.nameOfFile);
+
+            new Thread(delegate () {
+                while (!stop)
+                {
+
+
+
+                    int counter = 0;
+                    string line;
+
+                    // Read the file and display it line by line.  
+                    System.IO.StreamReader file =
+                        new System.IO.StreamReader(nameOfFile);
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        //System.Console.WriteLine(line);
+                        telnetClientFlightGear.Write(line);
+                        counter++;
+                        Thread.Sleep(millisecondsTimeout);// read the data in 4Hz
+                      
+                    }
+
+                    file.Close();       
+                   
+                   
+                }
+                telnetClientFlightGear.Write("enough");
+            }).Start();
+        }
+
+        //Change the speed of sending data to flight gear
+        public int MillisecondsTimeout
+        {
+            get { return millisecondsTimeout; }
+            set
+            {
+                millisecondsTimeout = value;
+            }
+        }
+        public string NameOfFile
+        {
+            get { return this.nameOfFile; }
+            set
+
+            {
+                //Maybe this is problematic because the pointer points to the same string//////////////////////////////////////////////
+                this.nameOfFile = value;  
+            }
+        }
+
+
+
+
+
+
 
         //flight control
         private float aileron;

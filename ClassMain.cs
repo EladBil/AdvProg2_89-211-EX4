@@ -9,13 +9,21 @@ namespace model
 
         public static void Main()
         {
-             MyTelnetFlightGear c = new MyTelnetFlightGear();
-             c.Connect("127.0.0.1", 11000);
-             c.Write("hii my friend");
-            c.Read();
-            c.Disconnect();
-          
+            ITelnetClient telnetClientFlightGear = new MyTelnetFlightGear();
 
+            Model m = new Model(telnetClientFlightGear);
+            m.Connect("localhost", 11000);
+            m.NameOfFile = "reg_flight.csv";
+            m.start();
+            //m.Disconnect();
+
+            /*  MyTelnetFlightGear c = new MyTelnetFlightGear();
+             c.Connect("localhost", 11000);
+             c.Write("hii my friend");
+             Console.WriteLine(c.Read());
+             c.Disconnect();
+
+             */
         }
 
 

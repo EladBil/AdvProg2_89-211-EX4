@@ -17,110 +17,29 @@ namespace model
     }
 
 
-    class MyTelnetFlightGear
+    class MyTelnetFlightGear: ITelnetClient
     {
-        byte[] bytes = new byte[1024];
+        byte[] bytes = new byte[4096];
         Socket sender;
         
-        public void Connect(string ip, int port) {
-
-            IPHostEntry host = Dns.GetHostEntry("localhost");
-            IPAddress ipAddress = host.AddressList[0];
-            IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
-
-            // Create a TCP/IP  socket.    
-            this.sender = new Socket(ipAddress.AddressFamily,
-                SocketType.Stream, ProtocolType.Tcp);
-            this.sender.Connect(remoteEP);
-
-        }
-        public void Write(string command) {
-            Console.WriteLine("Socket connected to {0}",
-                       this.sender.RemoteEndPoint.ToString());
-
-            // Encode the data string into a byte array.    
-            byte[] msg = Encoding.ASCII.GetBytes("This is a test<EOF>");
-
-            // Send the data through the socket.    
-            int bytesSent = this.sender.Send(msg);
-        }
-        public string Read() {
-            // Receive the response from the remote device.    
-            int bytesRec = this.sender.Receive(this.bytes);
-            Console.WriteLine("Echoed test = {0}",
-                Encoding.ASCII.GetString(this.bytes, 0, bytesRec));
-
-            return ""; }
-        public void Disconnect() {
-            this.sender.Shutdown(SocketShutdown.Both);
-            this.sender.Close();
-
-        }
-
-
-
-
-        /*
-
-
-
-
-
-    byte[] bytes = new byte[4096];
-
-
-        private Socket sender;
-        public void Connect(string ip, int port)
+        public void Connect(string ip, int port) 
         {
-
-           
-
-
+            // Connect to a Remote server  
+            // Get Host IP Address that is used to establish a connection  
+            // In this case, we get one IP address of localhost that is IP : 127.0.0.1  
+            // If a host has multiple addresses, you will get a list of addresses  
             try
             {
-                // Connect to a Remote server  
-                // Get Host IP Address that is used to establish a connection  
-                // In this case, we get one IP address of localhost that is IP : 127.0.0.1  
-                // If a host has multiple addresses, you will get a list of addresses  
-               
-                
-                
-                // IPAddress ipAddress = host.AddressList[0];
-               // IPAddress ipAddress = IPAddress.Parse(ip);
-
-                //IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
-
-
-
-
-                IPHostEntry host = Dns.GetHostEntry("localhost");
+                IPHostEntry host = Dns.GetHostEntry(ip);
                 IPAddress ipAddress = host.AddressList[0];
-                IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
-
-
-                Socket sender2 = new Socket(ipAddress.AddressFamily,
-                SocketType.Stream, ProtocolType.Tcp);
-
+                IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
                 // Create a TCP/IP  socket.    
                 this.sender = new Socket(ipAddress.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
-
-               
-
-
-
-
-
                 try
                 {
-                    // Connect to Remote EndPoint  
                     this.sender.Connect(remoteEP);
-                    // Encode the data string into a byte array.    
-                    byte[] msg = Encoding.ASCII.GetBytes("Yedidya Bachar");
-
-                    // Send the data through the socket.    
-                    int bytesSent = sender.Send(msg);
                 }
                 catch (ArgumentNullException ane)
                 {
@@ -141,16 +60,19 @@ namespace model
                 Console.WriteLine(e.ToString());
             }
 
+
         }
-        public void Write(string command)
+        public void Write(string command) 
         {
+            //   Console.WriteLine("Socket connected to {0}", this.sender.RemoteEndPoint.ToString());
+
+            // Encode the data string into a byte array.
             try
             {
-                // Encode the data string into a byte array.    
                 byte[] msg = Encoding.ASCII.GetBytes(command);
 
                 // Send the data through the socket.    
-                int bytesSent = sender.Send(msg);
+                int bytesSent = this.sender.Send(msg);
             }
             catch (ArgumentNullException ane)
             {
@@ -164,18 +86,16 @@ namespace model
             {
                 Console.WriteLine("Unexpected exception : {0}", e.ToString());
             }
-
-
-
         }
-        public string Read()
+        public string Read() 
         {
-            int bytesRec;
             try
             {
                 // Receive the response from the remote device.    
-                bytesRec = this.sender.Receive(bytes);
-                return Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                int bytesRec = this.sender.Receive(this.bytes);
+                //  Console.WriteLine("Echoed test = {0}",   Encoding.ASCII.GetString(this.bytes, 0, bytesRec));
+
+                return Encoding.ASCII.GetString(this.bytes, 0, bytesRec);
             }
             catch (ArgumentNullException ane)
             {
@@ -189,20 +109,11 @@ namespace model
             {
                 Console.WriteLine("Unexpected exception : {0}", e.ToString());
             }
-            return "dont read";
-
-
-
-
-
-           
-
+            return "-1";
         }
-        public void Disconnect()
-        {
+        public void Disconnect() {
             try
             {
-                // Release the socket.    
                 this.sender.Shutdown(SocketShutdown.Both);
                 this.sender.Close();
             }
@@ -220,6 +131,7 @@ namespace model
             }
         }
 
-    }*/
+
+
     }
 }
