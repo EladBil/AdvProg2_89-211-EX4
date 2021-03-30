@@ -11,10 +11,10 @@ extern "C" __declspec(dllexport) void* createTS(const char* CSVfileName) {
 extern "C" __declspec(dllexport) vector<float> TsGetAttributeData(TimeSeries * ts, string name) {
 	return ts->getAttributeData(name);
 }
-extern "C" __declspec(dllexport) vector<string> TsgettAttributes(TimeSeries * ts) {
+extern "C" __declspec(dllexport) vector<string> TsGettAttributes(TimeSeries * ts) {
 	return ts->gettAttributes();
 }
-extern "C" __declspec(dllexport) size_t TsgetRowSize(TimeSeries * ts) {
+extern "C" __declspec(dllexport) size_t TsGetRowSize(TimeSeries * ts) {
 	return ts->getRowSize();
 }
 
