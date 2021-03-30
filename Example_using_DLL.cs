@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Practice. uncomment the section you would like to try
  */
 using System;
@@ -148,6 +148,10 @@ namespace AP2
 
 
             /*
+            
+            //Hybrid Anomaly Detector example
+
+
             //creating ts's for normal and detect
             IntPtr t1 = createTS("train.csv");
             IntPtr t2 = createTS("test.csv");
@@ -170,7 +174,8 @@ namespace AP2
             HadDelete(had);
             TsDelete(t1);
             TsDelete(t2);
-            //end simple anomaly detector
+
+            //end Hybrid anomaly detector
 
             */
             Console.WriteLine("end");
