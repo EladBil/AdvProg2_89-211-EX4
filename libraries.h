@@ -1,53 +1,181 @@
+/*
+* NOTE:
+* Everytime you receive a non primitive type, you have to recieve it as an IntPtr in c#!!!!
+* The only way to use that IntPtr once you have it in c# is to call one (or some) of the functions in this header.
+* That is the ONLY way to access the data inside the IntPtr.
+* Once you finished with the intptr, call the appropriate delete function from this library so we don't
+* get a memory leak!
+*/
 #pragma once
 #include "timeseries.h"
 #include "HybridAnomalyDetector.h"
+#define EXPORT extern "C" __declspec(dllexport)
 /*
+* 
+* 
 * TimeSeries
+* 
+* 
 */
-extern "C" __declspec(dllexport) void* createTS(const char* CSVfileName) {
+EXPORT void* createTS(const char* CSVfileName) {
 	return (void*) new TimeSeries(CSVfileName);
 }
 
-extern "C" __declspec(dllexport) vector<float> TsGetAttributeData(TimeSeries * ts, string name) {
-	return ts->getAttributeData(name);
+
+//gives amount of attributes (amount of items per row)
+EXPORT size_t TsGetAttributesSize(TimeSeries * ts) {
+	return ts->getAttributesSize();
 }
-extern "C" __declspec(dllexport) vector<string> TsGetAttributes(TimeSeries * ts) {
-	return ts->gettAttributes();
-}
-extern "C" __declspec(dllexport) size_t TsGetRowSize(TimeSeries * ts) {
+//Gives length of colomns (how many lines are in the timeseries)
+EXPORT size_t TsGetColSize(TimeSeries * ts) {
 	return ts->getRowSize();
 }
 
 /*
-* SimpleAnomalyDetector
+Recive an IntPtr on c# side. To get item from index of row, call TsGetInRow.
+so it should be:
+		[DllImport("AP2Libraries.dll")]
+		public static extern IntPtr TsGetRow(IntPtr ts, int j);
+
+MAKE SURE TO DELETE THE ROW WHEN DONE by calling TsDeleteRow!!
 */
-extern "C" __declspec(dllexport) void* createSad() {
+EXPORT vector<float>* TsGetRow(TimeSeries * ts, int j) {
+	vector<float>* v = new vector<float>();
+	*v = ts->getRow(j);
+	return v;
+}
+/*
+* same for this. Use TsGetInRow and TsDeleteRow when done
+* returns the colomn at given index
+*/
+EXPORT vector<float>* TsGetColByIndex(TimeSeries* ts, int i) {
+	vector<float>* v = new vector<float>();
+	*v = ts->getAttributeData(ts->gettAttributes().at(i));
+	return v;
+}
+//returns item i in the row you recieved from TsGetRow
+EXPORT float TsGetInRow(vector<float>* row, int i) {
+	return row->at(i);
+}
+EXPORT void TsDeleteRow(vector<float>* row) {
+	delete row;
+}
+//delete TS
+EXPORT void TsDelete(TimeSeries* ts) {
+	delete ts;
+}
+
+
+/*
+*
+* 
+* SimpleAnomalyDetector
+* 
+*/
+EXPORT void* createSad() {
 	return (void*) new SimpleAnomalyDetector();
 }
-extern "C" __declspec(dllexport) void SadLearnNormal(SimpleAnomalyDetector * s, const TimeSeries & ts) {
+EXPORT void SadLearnNormal(SimpleAnomalyDetector * s, const TimeSeries & ts) {
 	s->learnNormal(ts);
 }
-extern "C" __declspec(dllexport)  vector<AnomalyReport> SadDetect(SimpleAnomalyDetector * s, const TimeSeries & ts) {
-	return s->detect(ts);
+
+EXPORT void SadDelete(SimpleAnomalyDetector* s) {
+	delete s;
 }
-extern "C" __declspec(dllexport) vector<correlatedFeatures> SadGetNormalModel(SimpleAnomalyDetector * s) {
-	return s->getNormalModel();
+
+//recieve as an IntPtr
+EXPORT  vector<AnomalyReport>* SadDetect(SimpleAnomalyDetector * s, const TimeSeries & ts) {
+	vector<AnomalyReport>* v = new vector<AnomalyReport>();
+	*v = s->detect(ts);
+	return v;
 }
-extern "C" __declspec(dllexport) void SadSetCorrelationThreshold(SimpleAnomalyDetector* s, float threshold) {
-	s->setCorrelationThreshold(threshold);
+
+//gets size of given anomaly report, ALSO WORKS FOR HYBRID!!!!
+EXPORT int reportSize(vector<AnomalyReport>* v) {
+	return v->size();
+}
+//gets tempstep of given anomaly at index i, ALSO WORKS FOR HYBRID!!!!
+EXPORT int reportGetAtIndex(vector<AnomalyReport>* v, int i) {
+	return v->at(i).timeStep;
+}
+//deletes anomaly report, ALSO WORKS FOR HYBRID!!!!
+EXPORT void reportDelete(vector<AnomalyReport>* v) {
+	delete v;
 }
 
 /*
+* 
+* 
 * HybridAnomalyDetector (Actually only finds circles)
+* 
+* 
 */
-extern "C" __declspec(dllexport) void* createHad() {
+EXPORT void* createHad() {
 	return (void*) new HybridAnomalyDetector();
 }
-extern "C" __declspec(dllexport) void HadLearnNormal(HybridAnomalyDetector * h, const TimeSeries & ts) {
+EXPORT void HadLearnNormal(HybridAnomalyDetector * h, const TimeSeries & ts) {
 	h->learnNormal(ts);
 }
-extern "C" __declspec(dllexport) vector<AnomalyReport> HadDetect(SimpleAnomalyDetector * h, const TimeSeries & ts) {
-	return h->detect(ts);
+//gives anomaly report. Make sure to delete when done and to access the report detaild, use report functions above
+EXPORT  vector<AnomalyReport>* HadDetect(HybridAnomalyDetector* h, const TimeSeries& ts) {
+	vector<AnomalyReport>* v = new vector<AnomalyReport>();
+	*v = h->detect(ts);
+	return v;
 }
 
+EXPORT void HadDelete(HybridAnomalyDetector * had) {
+	delete had;
+
+}
+
+
+/*
+* 
+* Pearson
+* gets pearson from colomn index
+* 
+*/
+EXPORT float pearsonFromColIndex(TimeSeries * ts, int col1, int col2) {
+	vector<float> * v1 = TsGetColByIndex(ts, col1);
+	vector<float>* v2 = TsGetColByIndex(ts, col2);
+	float* x = v1->data();
+	float* y = v2->data();
+	float ans =  pearson(x, y, v1->size());
+	delete v1;
+	delete v2;
+	return ans;
+	
+}
+
+/*
+* 
+* 
+* Cov, var, avg from Ts colomn to calculate linear reg
+* 
+* 
+*/
+EXPORT float covFromColIndex(TimeSeries* ts, int col1, int col2) {
+	vector<float>* v1 = TsGetColByIndex(ts, col1);
+	vector<float>* v2 = TsGetColByIndex(ts, col2);
+	float* x = v1->data();
+	float* y = v2->data();
+	float ans = cov(x, y, v1->size());
+	delete v1;
+	delete v2;
+	return ans;
+}
+EXPORT float varFromColIndex(TimeSeries* ts, int col) {
+	vector<float>* v1 = TsGetColByIndex(ts, col);
+	float* x = v1->data();
+	float ans = var(x, v1->size());
+	delete v1;
+	return ans;
+}
+EXPORT float avgFromColIndex(TimeSeries* ts, int col) {
+	vector<float>* v1 = TsGetColByIndex(ts, col);
+	float* x = v1->data();
+	float ans = avg(x, v1->size());
+	delete v1;
+	return ans;
+}
 
