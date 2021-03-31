@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
@@ -21,8 +22,31 @@ namespace model
         int GetNumberRows();
         float GetRefreshRate();
         void SetRefreshRate(float speed);
-        public int[,] GetRowOfPoint(string graph);
-        public Line lineReg(string value1, string value2);
+        int[,] GetRowOfPoint(string graph);
+        Line lineReg(string value1, string value2);
+        /*
+         * given an attribute it gives you the current info on the row
+         * we are on now.
+         * Should work like this:
+         * You have IntPtr currentRow.
+         * find index of attribute (int i)
+         * call from DLL:
+         * return TsGetInRow(currentRow, i);
+         */
+        float GetDetailNow(string atrribute);
+
+        /*
+         * list of attribute 
+         * */
+        List<string> ListOfAttribute();
+        /*
+         * returns list of anomalies based off of reg (SAD) and circle (HAD)
+         */
+
+        List<int> AnomalyReg();
+        List<int> AnomalyCirc();
+
+
 
         /*
          * get most cor receives a field (thats on a csv) and returns which one of the other fields are the most corralitive from the 
@@ -112,8 +136,8 @@ namespace model
         
 
 
-        private int millisecondsTimeout = 100;
-        private string nameOfFile = "";
+      
+      
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -141,7 +165,7 @@ namespace model
         public void start()
         {
             //need take rows from th eime series wait to shmoel
-            // IntPtr ts = CreateTs(this.nameOfFile);
+            // IntPtr ts = CreateTs(this.fileCsv);
 
             new Thread(delegate ()
             {
@@ -155,7 +179,7 @@ namespace model
 
                     // Read the file and display it line by line.  
                     System.IO.StreamReader file =
-                        new System.IO.StreamReader(nameOfFile);
+                        new System.IO.StreamReader(fileCsv);
                     while ((line = file.ReadLine()) != null)
                     {
                         //System.Console.WriteLine(line);
@@ -184,12 +208,12 @@ namespace model
         }
         public string NameOfFile
         {
-            get { return this.nameOfFile; }
+            get { return this.fileCsv; }
             set
 
             {
                 //Maybe this is problematic because the pointer points to the same string//////////////////////////////////////////////
-                this.nameOfFile = value;
+                this.fileCsv = value;
             }
         }
 
