@@ -11,19 +11,65 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Linq;
 
 namespace model
 {
     partial class Model : IModel
     {
+
+
         //private string fileCsv;
+        private float speed = 1;
         private int millisecondsTimeout = 100;
         private string fileCsv = "";
-        private string fileCsvToWork = "fileCsvToWork.csv";
+        private readonly string fileCsvToWork = "fileCsvToWork.csv";
+        /// <summary>
+        /// The first line we want to add to untitled files
+        /// </summary>
+        private string firstLine = "";
+        /// <summary>
+        /// Will hold the api file name
+        /// </summary>
+        private string fileAPI = "";
+        /// <summary>
+        /// Holds the number of existing attributes
+        /// </summary>
+        private int countAttribute = 0;
+        /// <summary>
+        /// Holds the number of rows (without the attribute names) of the csv file
+        /// </summary>
+        private int countRows = 0;
+        /// <summary>
+        /// Holds the IP of the flight gear
+        /// </summary>
+        private string ip = "";
+        /// <summary>
+        /// Holds the port of the flight gear
+        /// </summary>
+        private int port = 0;
+        /// <summary>
+        /// Holds the pointer to the current vector (line) that we use in the file
+        /// At first it is initialized to line 0
+        /// </summary>
+        private IntPtr vectorRowNow;
+        /// <summary>
+        /// The dictionary "speedToMilliseconds" links the number of speeds to the number of milliseconds 
+        /// that the thread will rest between each pull of a row from timeseries
+        /// </summary>
+        private Dictionary<float, int> speedToMilliseconds;
 
-        private string fileAPI;
+        
+        /// <summary>
+        /// "DictValuesToNumInCsv" - map between the values and their column number in the csv file
+        /// </summary>
+        private Dictionary<string, int> DictValuesToNumInCsv;
+        //Map between The variables to their names in the file
+       
+
         private IntPtr ts;
-        private int indexFrame = 0;
+
+       
 
         /*
          * Importing all the functions from dll so we can use them
@@ -85,132 +131,291 @@ namespace model
 
 
 
-        /// 
+        /// <summary>This method uppload file API and create dictionary 
+        /// Which maps between values and numbers.</summary>
+        /// <param name="pathFileAPI">the path of file API.</param>
+        ///
         public int LoadingAPI(string pathFileAPI)
         {
+            this.fileAPI = pathFileAPI;
+            this.firstLine = Scattering.CreatestringOfValues(pathFileAPI);
+            this.DictValuesToNumInCsv = new Dictionary<string, int>();
 
+            this.firstLine = Scattering.CreateDictionaryFromStringCSV(this.DictValuesToNumInCsv, this.firstLine);
+          
             return 0;
         }
+
         public int LoadingCSV(string PathFileCSV)
         {
 
-            string data = "";
-            string firstLine = "";
+             string data = "";
             File.WriteAllText(this.fileCsvToWork, data);
-            Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, firstLine);
+            
+            Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
 
+            ts = createTS(this.fileCsvToWork);
+            this.vectorRowNow = TsGetRow(ts, 0);
+            this.countRows = TsGetColSize(ts);
+           
+            this.countAttribute = TsGetAttributesSize(ts);
 
-
-
-
-
-
-
-            ts = createTS(fileAPI);
-
+          
             return 0;
         }
-        //Frame getFrame();
-        public void SetIndexFrame(int index)
-        {
-            this.indexFrame = index;
-        }
-        public int GetIndexFrame()
-        {
-            return this.indexFrame;
-        }
+        
+
+        /// <summary>This method return number of rows of csv file Without the first line of attribute</summary>
+        ///<returns>number of rows of csv file Without the first line of attribute</returns>
         public int GetNumberRows()
         {
-            return TsGetColSize(this.ts);
+            //return TsGetColSize(this.ts);
+            return this.countRows;
         }
-        //get speed of flight
+       
+        /// <summary>
+        /// return the speed of send Of sending the data
+        /// Speed is milliseconds and the process stops between sending
+        /// 
+        /// </summary>
+        /// <returns>int of Speed </returns>
         public float GetRefreshRate()
         {
-            return this.millisecondsTimeout;
+            return this.speed;
         }
         //set speed of flight
+        /// <summary>
+        /// Sets the speed of data transmission
+        /// Gets a number and converts it to the millisecond quantity to wait
+        /// by dictionary
+        /// </summary>
+        /// <param name="speed"></param>
         public void SetRefreshRate(float speed)
         {
-            if (speed == 0)
+            if (this.speedToMilliseconds.ContainsKey(speed))
             {
-                this.millisecondsTimeout = 200;
+                this.speed = speed;
+                this.millisecondsTimeout = this.speedToMilliseconds[speed];
             }
-            else if (speed == 0.5)
-            {
-                this.millisecondsTimeout = 150;
-            }
-            else if (speed == 1)
-            {
-                this.millisecondsTimeout = 100;
-            }
-            else if (speed == 1.5)
-            {
-                this.millisecondsTimeout = 50;
-            }
-            else if (speed == 2)
-            {
-                this.millisecondsTimeout = 20;
-            }
-
+           
         }
-        /*
-         * get most cor receives a field (thats on a csv) and returns which one of the other fields are the most corralitive from the 
-         * begining to end based
-         * on the pearson.
-         * */
+
+
+        /// <summary>
+        /// The method converts the vector pointer to a float list
+        /// </summary>
+        /// <param name="p">pointer to vector of float from dll</param>
+        /// <param name="size"> the size of vector</param>
+        /// <returns>list of float</returns>
+        private List<float> vectorFromIntPtrToList(IntPtr p  , int size)
+        {
+
+            List<float> l = new List<float>();
+            for (int i = 0; i < size; i++)
+            {
+                l.Add(TsGetInRow(p, i));
+               // Console.WriteLine(TsGetInRow(p, i));               
+            }
+            return l;
+        }
+
+
+        /// <summary>
+        /// get most cor receives a field (thats on a csv) and returns which one of the 
+        ///other fields are the most corralitive from the 
+        /// begining to end based
+        /// on the pearson.
+        /// </summary>
+        /// <param name="givenIndex"></param>
+        /// <returns>
+        /// name of attribute most Correlative
+        ///  if return -1 have problem</returns>
+
         public string GetMostCor(string givenIndex)
         {
-            return "ye";
+            float corMost = 0;
+            string nameOfMostCor = "-1";
+            int atrribute1;
+            //check if string in dictionary
+            if (this.DictValuesToNumInCsv.ContainsKey(givenIndex))
+            {
+                atrribute1 = this.DictValuesToNumInCsv[givenIndex];
+            }
+            else
+            {
+                return "-1";
+            }
+
+            foreach (KeyValuePair<string, int> attribute2 in this.DictValuesToNumInCsv)
+            {
+                float tempCor = 0;
+                //Skip the feature itself
+                if (attribute2.Key.Equals(givenIndex)){
+                    continue;
+                }
+                tempCor = pearsonFromColIndex(this.ts, atrribute1, attribute2.Value);
+  
+                if(Math.Abs(tempCor)>= Math.Abs(corMost))
+                {
+                    nameOfMostCor = attribute2.Key;
+                    corMost = tempCor;
+                }
+            }
+           
+            return nameOfMostCor;
         }
-        public int[,] GetRowOfPoint(string graph)
-        {
-            int[,] array2D = new int[,] { { 1, 2 }, { 3, 4 }, { 5, 6 }, { 7, 8 } };
-            return array2D;
-        }
+
+
+
+        /// <summary>
+        /// The function calculates the linear line between two variables by a formula
+        ///In addition the function uses external functions of dll
+        /// </summary>
+        /// <param name="value1">string of name of first column of values</param>
+        /// <param name="value2">string of name of second column of values</param>
+        /// <returns>Line of reg</returns>
         public Line lineReg(string value1, string value2)
         {
-            return new Line();
+           
+            int x = this.DictValuesToNumInCsv[value1];
+            int y = this.DictValuesToNumInCsv[value2];
+
+            float a = covFromColIndex(this.ts ,x, y) / varFromColIndex(this.ts , x);
+            float b = avgFromColIndex(this.ts, y) - a * avgFromColIndex(this.ts, x);
+
+            return new Line(a, b);
         }
-
-
-
-        public List<string> ListOfAttribute()
+        /// <summary>
+        /// GetListOfAttribute -  return list of Attributes (values) 
+        /// Made by getting all the keys in the dictionary to list
+        /// </summary>
+        /// <returns>list of attributes</returns>
+        public List<string> GetListOfAttribute()
         {
-            return new List<string>();////////////////////////////
+
+            return new List<string>(this.DictValuesToNumInCsv.Keys);
+
         }
 
-
-
-
-        /*
-            * given an attribute it gives you the current info on the row
-            * we are on now.
-            * Should work like this:
-            * You have IntPtr currentRow.
-            * find index of attribute (int i)
-            * call from DLL:
-            * return TsGetInRow(currentRow, i);
-            */
+        /// <summary>
+        ///   given an attribute it gives you the current info on the row
+        /// we are on now.
+        /// </summary>
+        /// <param name="atrribute">Name the attribute I am looking for its value</param>
+        /// <returns>The value of the attribute in the appropriate location</returns>
         public float GetDetailNow(string atrribute)
         {
-            return 0;
-        }
 
-     
+            int detail = this.DictValuesToNumInCsv[atrribute];
+            return TsGetInRow(this.vectorRowNow, detail);
+
+        }
         /*
          * returns list of anomalies based off of reg (SAD) and circle (HAD)
          */
 
-        public List<int> AnomalyReg()
+        /// <summary>
+        /// Calculate the anomalies using dll functions for regression
+        /// </summary>
+        /// <param name="learnNormalCsv">A path of a file for learning the algorithm</param>
+        /// <returns>list of anomalies based off of reg (SAD)</returns>
+        public List<int> AnomalyReg(string learnNormalCsv)
         {
-            return new List<int>();
-        }
-        public List<int> AnomalyCirc()
-        {
-            return new List<int>();
-        }
+            string learnNormalCsvToWork = "learnNormalCsvToWork.csv";
+            //create ts to learnNormalCsv
+            var lineCount = 0;
+            using (var reader = File.OpenText(learnNormalCsv))
+            {
+                while (reader.ReadLine() != null)
+                {
+                    lineCount++;
+                }
+            }
+           
 
 
+
+            string data = "";
+            File.WriteAllText(learnNormalCsvToWork, data);
+
+            Scattering.AddFirstLineInCsv(learnNormalCsv, learnNormalCsvToWork, this.firstLine);
+
+
+
+            IntPtr tsNormal = createTS(learnNormalCsvToWork);
+            //create list of time anomaly
+            List<int> timeStepOfAnomaly = new List<int>();
+            //create SimpleAnomalyDetector
+            IntPtr sad = createSad();
+
+            //The algorithm learns the normal file
+            SadLearnNormal(sad, tsNormal);
+            //The algorithm checks for anomalies in our file
+            IntPtr vectorAnomalyReport = SadDetect(sad, this.ts);
+            //size of vector reports
+            int sizeOfVector = reportSize(vectorAnomalyReport);
+            for(int i = 0; i< sizeOfVector;i++)
+            {
+                timeStepOfAnomaly.Add(reportGetAtIndex(vectorAnomalyReport, i));
+            }
+
+            SadDelete(sad);
+            List<int> uniqueLst = timeStepOfAnomaly.Distinct().ToList();
+            uniqueLst.Sort();
+            return uniqueLst;
+        }
+        /// <summary>
+        /// Calculate the anomalies using dll functions for Circle
+        /// </summary>
+        /// <param name="learnHibridCsv">A path of a file for learning the algorithm</param>
+        /// <returns>list of anomalies based off of circle (HAD)</returns>
+        public List<int> AnomalyCirc(string learnHibridCsv)
+        {
+
+            string learnHibridCsvToWork = "learnHibridCsvToWork.csv";
+            //create ts to learnNormalCsv
+            var lineCount = 0;
+            using (var reader = File.OpenText(learnHibridCsv))
+            {
+                while (reader.ReadLine() != null)
+                {
+                    lineCount++;
+                }
+            }
+            
+
+
+
+            string data = "";
+            File.WriteAllText(learnHibridCsvToWork, data);
+
+            Scattering.AddFirstLineInCsv(learnHibridCsv, learnHibridCsvToWork, this.firstLine);
+
+            //create ts to learnNormalCsv
+            IntPtr tsNormal = createTS(learnHibridCsvToWork);
+            //create list of time anomaly
+            List<int> timeStepOfAnomaly = new List<int>();
+            //create SimpleAnomalyDetector
+            IntPtr had = createHad();
+
+            //The algorithm learns the normal file
+            HadLearnNormal(had, tsNormal);
+            //The algorithm checks for anomalies in our file
+            IntPtr vectorAnomalyReport = HadDetect(had, this.ts);
+            //size of vector reports
+            int sizeOfVector = reportSize(vectorAnomalyReport);
+            for (int i = 0; i < sizeOfVector; i++)
+            {
+                timeStepOfAnomaly.Add(reportGetAtIndex(vectorAnomalyReport, i));
+            }
+
+            HadDelete(had);
+            List<int> uniqueLst = timeStepOfAnomaly.Distinct().ToList();
+            uniqueLst.Sort();
+            return uniqueLst;
+        }
+
+       
     }
 
 }
