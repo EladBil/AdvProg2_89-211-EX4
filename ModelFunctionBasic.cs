@@ -10,41 +10,82 @@ using System.Runtime.InteropServices;
 
 namespace model
 {
+    /// <summary>
+    /// Interface for the model
+    /// </summary>
     interface IModel : INotifyPropertyChanged
     {
 
-        //Frame getFrame();
+        /// <summary>
+        /// upload file API
+        /// </summary>
+        /// <param name="fileAPI">path</param>
+        /// <returns></returns>
         public int LoadingAPI(string fileAPI);
+        /// <summary>
+        /// upload file csv
+        /// </summary>
+        /// <param name="fileAPI">path</param>
+        /// <returns></returns>
         public int LoadingCSV(string fileAPI);
 
-        void SetIndexFrame(int index);
-        int GetIndexFrame();
+        /// <summary>
+        /// Get Number Rows 
+        /// </summary>
+        /// <returns></returns>
         int GetNumberRows();
+        /// <summary>
+        /// get current speed
+        /// </summary>
+        /// <returns>return the speed</returns>
         float GetRefreshRate();
+        /// <summary>
+        /// Sets the desired speed
+        /// </summary>
+        /// <param name="speed"></param>
         void SetRefreshRate(float speed);
-        int[,] GetRowOfPoint(string graph);
+
+        /// <summary>
+        /// Given a feature returns all its values in order
+        /// </summary>
+        /// <param name="attribute">name of attribute</param>
+        /// <returns>List of attribute values </returns>
+        List<float> GetValuesSpecificAttribute(string attribute);
+       /// <summary>
+       /// line regers of 2 attributes
+       /// </summary>
+       /// <param name="value1"></param>
+       /// <param name="value2"></param>
+       /// <returns>line reg</returns>
         Line lineReg(string value1, string value2);
-        /*
-         * given an attribute it gives you the current info on the row
-         * we are on now.
-         * Should work like this:
-         * You have IntPtr currentRow.
-         * find index of attribute (int i)
-         * call from DLL:
-         * return TsGetInRow(currentRow, i);
-         */
+
+         
+        /// <summary>
+        /// given an attribute it gives you the current info on the row
+        /// we are on now.
+        /// </summary>
+        /// <param name="atrribute"></param>
+        /// <returns></returns>
         float GetDetailNow(string atrribute);
 
-        /*
-         * list of attribute 
-         * */
-        List<string> ListOfAttribute();
-        /*
-         * returns list of anomalies based off of reg (SAD) and circle (HAD)
-         */
-
-        List<int> AnomalyReg();
-        List<int> AnomalyCirc();
+       /// <summary>
+       /// return list of attributes
+       /// </summary>
+       /// <returns></returns>
+        List<string> GetListOfAttribute();
+      
+        /// <summary>
+        /// returns list of anomalies based off of reg (SAD) 
+        /// </summary>
+        /// <param name="learnNormalCsv"></param>
+        /// <returns></returns>
+        List<int> AnomalyReg(string learnNormalCsv);
+        /// <summary>
+        /// returns list of anomalies based off of circle (HAD)
+        /// </summary>
+        /// <param name="learnNormalCsv"></param>
+        /// <returns></returns>
+        List<int> AnomalyCirc(string learnNormalCsv);
 
 
 
@@ -53,9 +94,22 @@ namespace model
          * begining to end based
          * on the pearson.
          * */
+        /// <summary>
+        /// get most cor receives a field (thats on a csv) and returns which one of the other fields are the most corralitive from the 
+        /// begining to end based
+        /// on the pearson.
+        /// </summary>
+        /// <param name="givenIndex"></param>
+        /// <returns></returns>
         string GetMostCor(string givenIndex);
 
-        //Line getRegres(
+
+        int IndexFrame { get; set; }
+
+        /*
+         * properties of the features
+         * 
+         */
 
         //flight control
         float Aileron { set; get; }
@@ -132,72 +186,189 @@ namespace model
 
     partial class Model : IModel
     {
+
+
         //the function from dll
-        
 
 
-      
-      
+
+
+
+
+
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        ITelnetClient telnetClientFlightGear;
-        volatile Boolean stop;
+        readonly ITelnetClient telnetClientFlightGear;
+        private Boolean stop;
+
+        public Boolean Stop
+        {
+           
+            set
+            {
+                this.stop = value;
+            }
+
+        }
+
+
+        /// <summary>
+        /// constractor - Initializes the dictionary of speed
+        /// </summary>
+        /// <param name="telnetClient"></param>
         public Model(ITelnetClient telnetClient)
         {
             this.telnetClientFlightGear = telnetClient;
             stop = false;
 
+            this.speedToMilliseconds = new Dictionary<float, int>();
+            speedToMilliseconds.Add(0, 500);
+            speedToMilliseconds.Add((float)0.25,300 );
+            speedToMilliseconds.Add((float)0.5, 200);
+            speedToMilliseconds.Add(1, 100);
+            speedToMilliseconds.Add((float)1.25, 85);
+            speedToMilliseconds.Add((float)1.5, 75);
+            speedToMilliseconds.Add((float)1.75, 50);
+            speedToMilliseconds.Add(2, 20);
+
         }
+        /// <summary>
+        /// Connects to flight gear using telnetClientFlightGear
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
         public void Connect(string ip, int port)
         {
-            int i = -1;
-            while (i == -1)
-            {
-                i = telnetClientFlightGear.Connect(ip, port);
-            }
+            this.ip = ip;
+            this.port = port;
+            this.telnetClientFlightGear.Connect(this.ip, this.port);
         }
+        /// <summary>
+        /// disconnect from flight gear
+        /// </summary>
         public void Disconnect()
         {
             stop = true;
             telnetClientFlightGear.Disconnect();
         }
+        /// <summary>
+        /// Initiates a process by which it takes a line from the ts and sends
+        /// it to flight gear and updates all the fields accordingly
+        /// </summary>
         public void start()
         {
+           
+
+
             //need take rows from th eime series wait to shmoel
             // IntPtr ts = CreateTs(this.fileCsv);
 
+
+
+
             new Thread(delegate ()
             {
+                
                 while (!stop)
                 {
 
 
 
-                    int counter = 0;
                     string line;
 
-                    // Read the file and display it line by line.  
-                    System.IO.StreamReader file =
-                        new System.IO.StreamReader(fileCsv);
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        //System.Console.WriteLine(line);
-                        telnetClientFlightGear.Write(line);
-                        counter++;
-                        Thread.Sleep(millisecondsTimeout);// read the data in 4Hz
 
-                    }
 
-                    file.Close();
+                    float[] arrayValue = new float[this.countAttribute];
+
+                   // convert vectorFloat from dll to arrayFloat in c#
+                    
+                    this.vectorRowNow = TsGetRow(this.ts, IndexFrame);
+                    int i;
+                        for ( i = 0; i < this.countAttribute; i++)
+                        {
+                            arrayValue[i] = TsGetInRow(this.vectorRowNow, i);
+                        }
+                        this.updateAllattributes(arrayValue);
+                        line = String.Join(",", arrayValue);
+
+
+                                  telnetClientFlightGear.Write(line);
+                   
+                    IndexFrame++;
+                    Console.WriteLine(IndexFrame);
+
+                    Thread.Sleep(millisecondsTimeout);// read the data in 4Hz
+
 
 
                 }
-                telnetClientFlightGear.Write("enough");
+                //telnetClientFlightGear.Disconnect();
+
+
             }).Start();
+           
         }
 
-        //Change the speed of sending data to flight gear
+        /// <summary>
+        /// Update the fields
+        /// </summary>
+        /// <param name="arrayValue"></param>
+        private void updateAllattributes(float[] arrayValue)
+        {
+            Aileron = arrayValue[this.DictValuesToNumInCsv["aileron"]];
+            Elevator = arrayValue[this.DictValuesToNumInCsv["elevator"]];
+            Rudder = arrayValue[this.DictValuesToNumInCsv["rudder"]];
+            flaps = arrayValue[this.DictValuesToNumInCsv["flaps"]];
+            Slats = arrayValue[this.DictValuesToNumInCsv["slats"]];
+            Speedbrake = arrayValue[this.DictValuesToNumInCsv["speedbrake"]];
+            Throttle_1 = arrayValue[this.DictValuesToNumInCsv["throttle"]];
+            Throttle_2 = arrayValue[this.DictValuesToNumInCsv["throttle2"]];
+            EnginePump_1 = arrayValue[this.DictValuesToNumInCsv["engine-pump"]];
+            EnginePump_2 = arrayValue[this.DictValuesToNumInCsv["engine-pump2"]];
+
+            ElectriPump_1 = arrayValue[this.DictValuesToNumInCsv["electric-pump"]];
+            ElectriPump_2 = arrayValue[this.DictValuesToNumInCsv["electric-pump2"]];
+            ExternalPower = arrayValue[this.DictValuesToNumInCsv["external-power"]];
+            APUGenerator = arrayValue[this.DictValuesToNumInCsv["APU-generator"]];
+            LatitudeDeg = arrayValue[this.DictValuesToNumInCsv["latitude-deg"]];
+            LongitudeDeg = arrayValue[this.DictValuesToNumInCsv["longitude-deg"]];
+            AltitudeFt = arrayValue[this.DictValuesToNumInCsv["altitude-ft"]];
+            RollDeg = arrayValue[this.DictValuesToNumInCsv["roll-deg"]];
+            PitchDeg = arrayValue[this.DictValuesToNumInCsv["pitch-deg"]];
+            HeadingDeg = arrayValue[this.DictValuesToNumInCsv["heading-deg"]];
+            
+            SideSlipDeg = arrayValue[this.DictValuesToNumInCsv["side-slip-deg"]];
+            AirspeedKt = arrayValue[this.DictValuesToNumInCsv["airspeed-kt"]];
+            Glideslope = arrayValue[this.DictValuesToNumInCsv["glideslope"]];
+            VerticalSpeedFps = arrayValue[this.DictValuesToNumInCsv["vertical-speed-fps"]];
+            AirspeedIndicatorIndicatedSpeedKt = arrayValue[this.DictValuesToNumInCsv["airspeed-indicator_indicated-speed-kt"]];
+            AltimeterIndicatedAltitudeFt = arrayValue[this.DictValuesToNumInCsv["altimeter_indicated-altitude-ft"]];
+            AltimeterPressureAltFt = arrayValue[this.DictValuesToNumInCsv["altimeter_pressure-alt-ft"]];
+            AttitudeIndicatorIndicatedPitchDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_indicated-pitch-deg"]];
+            AttitudeIndicatorIndicatedRollDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_indicated-roll-deg"]];
+            AttitudeIndicatorInternalPitchDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_internal-pitch-deg"]];
+            
+            AttitudeIndicatorInternalRollDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_internal-roll-deg"]];
+            EncoderIndicatedAltitudeFt = arrayValue[this.DictValuesToNumInCsv["encoder_indicated-altitude-ft"]];
+            EncoderPressureAltFt = arrayValue[this.DictValuesToNumInCsv["encoder_pressure-alt-ft"]];
+            GpsIndicatedAltitudeFt = arrayValue[this.DictValuesToNumInCsv["gps_indicated-altitude-ft"]];
+            GpsIndicatedGroundSpeedKt = arrayValue[this.DictValuesToNumInCsv["gps_indicated-ground-speed-kt"]];
+            GpsIndicatedVerticalSpeed = arrayValue[this.DictValuesToNumInCsv["gps_indicated-vertical-speed"]];
+            IndicatedHeadingDeg = arrayValue[this.DictValuesToNumInCsv["indicated-heading-deg"]];
+            MagneticCompassIndicatedHeadingDeg = arrayValue[this.DictValuesToNumInCsv["magnetic-compass_indicated-heading-deg"]];
+            SlipSkidBallIndicatedSlipSkid = arrayValue[this.DictValuesToNumInCsv["slip-skid-ball_indicated-slip-skid"]];
+            TurnIndicatorIndicatedTurnRate = arrayValue[this.DictValuesToNumInCsv["turn-indicator_indicated-turn-rate"]];
+           
+            VerticalSpeedIndicatorIndicatedSpeedFpm = arrayValue[this.DictValuesToNumInCsv["vertical-speed-indicator_indicated-speed-fpm"]];
+            EngineRpm = arrayValue[this.DictValuesToNumInCsv["engine_rpm"]];
+
+        }
+
+        /// <summary>
+        /// Change the speed of sending data to flight gear
+        /// </summary>
         public int MillisecondsTimeout
         {
             get { return millisecondsTimeout; }
@@ -206,20 +377,24 @@ namespace model
                 millisecondsTimeout = value;
             }
         }
-        public string NameOfFile
+        
+
+
+
+        private int indexFrame;
+        public int IndexFrame
         {
-            get { return this.fileCsv; }
-            set
-
+            get
             {
-                //Maybe this is problematic because the pointer points to the same string//////////////////////////////////////////////
-                this.fileCsv = value;
+                return indexFrame;
             }
+            set
+            {
+                indexFrame = value;
+                NotifyPropertyChanged("indexFrame");
+            }
+
         }
-
-
-
-
 
 
 
@@ -670,9 +845,11 @@ namespace model
 
         private void NotifyPropertyChanged(string propName)
         {
-            //  if (this.PropertyChanged != null)
-            //The question mark replaces the check null
-            this?.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            if (this.PropertyChanged != null)
+            {
+                //The question mark replaces the check null
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
 
     }

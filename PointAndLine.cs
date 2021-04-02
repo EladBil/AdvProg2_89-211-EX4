@@ -4,7 +4,7 @@ using System.Text;
 
 namespace model
 {
-    class Point
+  /*  class Point
     {
         float x;
         public float X
@@ -25,16 +25,57 @@ namespace model
                 y = value;
             }
         }
-    }
+    }*/
 
 
 
     class Line
     {
-        List<Point> points = new List<Point>();
+
+        private float a, b;
+        public Line(float a, float b)
+        {
+            this.a = a;
+            this.b = b;
+        }
+
+        public float A
+        {
+            get
+            {
+                return a;
+            }
+            set
+            {
+                a = value;
+            }
+
+        }
+
+        public float B
+        {
+            get
+            {
+                return b;
+            }
+            set
+            {
+                b = value;
+            }
+
+        }
+
+
+        public float F(float x)
+        {
+            return a * x + b;
+        }
+    }
+            
+
         
        
     }
 
 
-}
+

@@ -27,7 +27,18 @@ namespace model
             int i = 0;
             foreach (XmlNode xn in xnList)
             {
+
+               
+
+
                 string firstName = xn["name"].InnerText;
+
+                if (myDict.ContainsKey(firstName)) 
+                {
+                    firstName =  String.Concat(firstName, "2");
+                   
+                }
+
                 myDict.Add(firstName, i);
 
                 Console.WriteLine(firstName);
@@ -35,6 +46,40 @@ namespace model
             return myDict;
 
         }
+
+
+        public static string CreatestringOfValues(string fileXML)
+        {
+            System.Text.StringBuilder builder = new System.Text.StringBuilder("");
+            string myXmlString = File.ReadAllText(fileXML);
+            XmlDocument xml = new XmlDocument();
+            xml.LoadXml(myXmlString);
+
+            XmlNodeList xnList = xml.SelectNodes("/PropertyList/generic/output/chunk");
+            int i = 0;
+            foreach (XmlNode xn in xnList)
+            {
+                if (i != 0)
+                {
+                    builder.Append(",");
+                }
+                i++;
+                string firstName = xn["name"].InnerText;
+                
+                builder.Append(firstName);
+               
+
+                //Console.WriteLine(firstName);
+            }
+            if (i != 0)
+            {
+                builder.Append("\r\n");
+            }
+            return builder.ToString();
+
+        }
+
+
 
 
         /*
@@ -47,21 +92,44 @@ namespace model
             // string filePathOld = @"C:\Test\test.csv";
             //string csvLine = "value1; value2; value3" + Environment.NewLine;
             byte[] csvLineBytes = Encoding.Default.GetBytes(csvLine);
-            using (MemoryStream ms = new MemoryStream())
+            using MemoryStream ms = new MemoryStream();
+            ms.Write(csvLineBytes, 0, csvLineBytes.Length);
+            using (FileStream file = new FileStream(filePathOld, FileMode.Open, FileAccess.Read))
             {
-                ms.Write(csvLineBytes, 0, csvLineBytes.Length);
-                using (FileStream file = new FileStream(filePathOld, FileMode.Open, FileAccess.Read))
-                {
-                    byte[] bytes = new byte[file.Length];
-                    file.Read(bytes, 0, (int)file.Length);
-                    ms.Write(bytes, 0, (int)file.Length);
-                }
-
-                using (FileStream file = new FileStream(filePathNew, FileMode.Open, FileAccess.Write))
-                {
-                    ms.WriteTo(file);
-                }
+                byte[] bytes = new byte[file.Length];
+                file.Read(bytes, 0, (int)file.Length);
+                ms.Write(bytes, 0, (int)file.Length);
             }
+
+            using (FileStream file = new FileStream(filePathNew, FileMode.Open, FileAccess.Write))
+            {
+                ms.WriteTo(file);
+            }
+        }
+
+        public static string CreateDictionaryFromStringCSV(Dictionary<string , int> myDict ,  string csvLine)
+        {
+            string[] words = csvLine.Split(',');
+            
+
+            for (int i = 0; i < words.GetLength(0); i++)
+            {
+                if (myDict.ContainsKey(words[i]))
+                {
+                    words[i] = String.Concat(words[i], "2");
+
+                }
+                words[i] = words[i].Replace("\r\n", string.Empty);
+                myDict.Add(words[i], i);
+            }
+            string temp = String.Join(",", words);
+            csvLine = temp + "\r\n ";
+            return csvLine;
+
+
+
+
+
         }
     }
 }

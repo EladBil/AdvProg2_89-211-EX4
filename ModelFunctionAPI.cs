@@ -20,9 +20,22 @@ namespace model
 
 
         //private string fileCsv;
+        /// <summary>
+        /// Current speed level
+        /// </summary>
         private float speed = 1;
+        /// <summary>
+        /// The delay time between pulling lines of the ts
+        /// </summary>
         private int millisecondsTimeout = 100;
+        /// <summary>
+        /// The path of the csv file we get to explore
+        /// </summary>
         private string fileCsv = "";
+        /// <summary>
+        /// The same file is sent to timeseries plus a row of attribute names
+        ///In order not to change the current file
+        /// </summary>
         private readonly string fileCsvToWork = "fileCsvToWork.csv";
         /// <summary>
         /// The first line we want to add to untitled files
@@ -64,9 +77,11 @@ namespace model
         /// "DictValuesToNumInCsv" - map between the values and their column number in the csv file
         /// </summary>
         private Dictionary<string, int> DictValuesToNumInCsv;
-        //Map between The variables to their names in the file
-       
 
+
+        /// <summary>
+        /// Pointer to timeseries that the current file holder holds
+        /// </summary>
         private IntPtr ts;
 
        
@@ -145,7 +160,14 @@ namespace model
           
             return 0;
         }
-
+        /// <summary>
+        /// Upload a csv file to explore
+        /// </summary>
+        /// <param name="PathFileCSV">The path of the file</param>
+        /// <returns>
+        /// 0 - success 
+        /// -1 - failure
+        /// </returns>
         public int LoadingCSV(string PathFileCSV)
         {
 
@@ -218,7 +240,12 @@ namespace model
             }
             return l;
         }
+        public List<float> GetValuesSpecificAttribute(string attribute)
+        {
+            int numberCol = this.DictValuesToNumInCsv[attribute];
 
+            return vectorFromIntPtrToList(TsGetColByIndex(this.ts, numberCol), this.GetNumberRows());
+        }
 
         /// <summary>
         /// get most cor receives a field (thats on a csv) and returns which one of the 

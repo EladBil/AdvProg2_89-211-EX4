@@ -78,7 +78,7 @@ namespace model
                 byte[] msg = Encoding.ASCII.GetBytes(command);
 
                 // Send the data through the socket.    
-                int bytesSent = this.sender.Send(msg);
+                //////////////////int bytesSent = this.sender.Send(msg);
                
                
             }
@@ -147,7 +147,7 @@ namespace model
 
     class MyTelnetFlightGearClientUDP : ITelnetClient
     {
-        byte[] bytes = new byte[4096];
+       
        
        
         private int port;
@@ -159,7 +159,7 @@ namespace model
             this.port = port;
            
             this.receiver  = new UdpClient();
-            this.receiver.Connect(IPAddress.Parse(ip) , port);
+            this.receiver.Connect(IPAddress.Parse(ip) , this.port);
             return 0;
         }
         public void Write(string command)
