@@ -28,10 +28,7 @@ namespace model
         /// The delay time between pulling lines of the ts
         /// </summary>
         private int millisecondsTimeout = 100;
-        /// <summary>
-        /// The path of the csv file we get to explore
-        /// </summary>
-        private string fileCsv = "";
+     
         /// <summary>
         /// The same file is sent to timeseries plus a row of attribute names
         ///In order not to change the current file
@@ -45,10 +42,7 @@ namespace model
         /// Will hold the api file name
         /// </summary>
         private string fileAPI = "";
-        /// <summary>
-        /// Holds the number of existing attributes
-        /// </summary>
-        private int countAttribute = 0;
+      
         /// <summary>
         /// Holds the number of rows (without the attribute names) of the csv file
         /// </summary>
@@ -65,7 +59,7 @@ namespace model
         /// Holds the pointer to the current vector (line) that we use in the file
         /// At first it is initialized to line 0
         /// </summary>
-        private IntPtr vectorRowNow;
+        private float[] arrayRowNow;
         /// <summary>
         /// The dictionary "speedToMilliseconds" links the number of speeds to the number of milliseconds 
         /// that the thread will rest between each pull of a row from timeseries
@@ -82,67 +76,9 @@ namespace model
         /// <summary>
         /// Pointer to timeseries that the current file holder holds
         /// </summary>
-        private IntPtr ts;
+        private TimeSeriesModel ts;
 
        
-
-        /*
-         * Importing all the functions from dll so we can use them
-         */
-        [DllImport("AP2Libraries.dll")]
-        public static extern void HadDelete(IntPtr had);
-        [DllImport("AP2Libraries.dll")]
-        public static extern void SadDelete(IntPtr sad);
-        [DllImport("AP2Libraries.dll")]
-        public static extern void TsDelete(IntPtr ts);
-        [DllImport("AP2Libraries.dll")]
-        public static extern int reportSize(IntPtr report);
-        [DllImport("AP2Libraries.dll")]
-        public static extern int reportGetAtIndex(IntPtr report, int i);
-        [DllImport("AP2Libraries.dll")]
-        public static extern void reportDelete(IntPtr report);
-
-        [DllImport("AP2Libraries.dll")]
-        public static extern IntPtr createSad();
-        [DllImport("AP2Libraries.dll")]
-        public static extern void SadLearnNormal(IntPtr Sad, IntPtr timeseries);
-        [DllImport("AP2Libraries.dll")]
-        public static extern IntPtr SadDetect(IntPtr Sad, IntPtr timeseries);
-
-        [DllImport("AP2Libraries.dll")]
-        public static extern IntPtr createHad();
-        [DllImport("AP2Libraries.dll")]
-        public static extern void HadLearnNormal(IntPtr Had, IntPtr timeseries);
-        [DllImport("AP2Libraries.dll")]
-        public static extern IntPtr HadDetect(IntPtr Had, IntPtr timeseries);
-
-        [DllImport("AP2Libraries.dll")]
-        public static extern float covFromColIndex(IntPtr ts, int col1, int col2);
-
-
-        [DllImport("AP2Libraries.dll")]
-        public static extern float varFromColIndex(IntPtr ts, int col);
-
-        [DllImport("AP2Libraries.dll")]
-        public static extern float avgFromColIndex(IntPtr ts, int col);
-
-        [DllImport("AP2Libraries.dll")]
-        public static extern int TsGetColSize(IntPtr ts);
-        [DllImport("AP2Libraries.dll")]
-        public static extern float pearsonFromColIndex(IntPtr ts, int col1, int col2);
-        [DllImport("AP2Libraries.dll")]
-        public static extern IntPtr TsGetColByIndex(IntPtr ts, int i);
-
-        [DllImport("AP2Libraries.dll")]
-        public static extern IntPtr createTS(string CSVfileName);
-        [DllImport("AP2Libraries.dll")]
-        public static extern IntPtr TsGetRow(IntPtr ts, int j);
-        [DllImport("AP2Libraries.dll")]
-        public static extern float TsGetInRow(IntPtr row, int i);
-        [DllImport("AP2Libraries.dll")]
-        public static extern int TsGetAttributesSize(IntPtr ts);
-        [DllImport("AP2Libraries.dll")]
-        public static extern void TsDeleteRow(IntPtr row);
 
 
 
@@ -175,14 +111,9 @@ namespace model
             File.WriteAllText(this.fileCsvToWork, data);
             
             Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
-
-            ts = createTS(this.fileCsvToWork);
-            this.vectorRowNow = TsGetRow(ts, 0);
-            this.countRows = TsGetColSize(ts);
-           
-            this.countAttribute = TsGetAttributesSize(ts);
-
-          
+            
+            this.ts =  new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
+         
             return 0;
         }
         
@@ -229,22 +160,12 @@ namespace model
         /// <param name="p">pointer to vector of float from dll</param>
         /// <param name="size"> the size of vector</param>
         /// <returns>list of float</returns>
-        private List<float> vectorFromIntPtrToList(IntPtr p  , int size)
-        {
-
-            List<float> l = new List<float>();
-            for (int i = 0; i < size; i++)
-            {
-                l.Add(TsGetInRow(p, i));
-               // Console.WriteLine(TsGetInRow(p, i));               
-            }
-            return l;
-        }
+      
         public List<float> GetValuesSpecificAttribute(string attribute)
         {
             int numberCol = this.DictValuesToNumInCsv[attribute];
 
-            return vectorFromIntPtrToList(TsGetColByIndex(this.ts, numberCol), this.GetNumberRows());
+            return ts.GetValuesSpecificAttribute(numberCol);
         }
 
         /// <summary>
@@ -280,9 +201,8 @@ namespace model
                 if (attribute2.Key.Equals(givenIndex)){
                     continue;
                 }
-                tempCor = pearsonFromColIndex(this.ts, atrribute1, attribute2.Value);
-  
-                if(Math.Abs(tempCor)>= Math.Abs(corMost))
+                tempCor = ts.pearsonFromColIndex(atrribute1, attribute2.Value);
+                if (Math.Abs(tempCor)>= Math.Abs(corMost))
                 {
                     nameOfMostCor = attribute2.Key;
                     corMost = tempCor;
@@ -307,10 +227,8 @@ namespace model
             int x = this.DictValuesToNumInCsv[value1];
             int y = this.DictValuesToNumInCsv[value2];
 
-            float a = covFromColIndex(this.ts ,x, y) / varFromColIndex(this.ts , x);
-            float b = avgFromColIndex(this.ts, y) - a * avgFromColIndex(this.ts, x);
 
-            return new Line(a, b);
+            return ts.lineReg(x,y);
         }
         /// <summary>
         /// GetListOfAttribute -  return list of Attributes (values) 
@@ -334,12 +252,14 @@ namespace model
         {
 
             int detail = this.DictValuesToNumInCsv[atrribute];
-            return TsGetInRow(this.vectorRowNow, detail);
+            return this.arrayRowNow[detail];
 
         }
-        /*
-         * returns list of anomalies based off of reg (SAD) and circle (HAD)
-         */
+
+
+
+        [DllImport("AP2Libraries.dll")]
+        public static extern float varFromColIndex(IntPtr ts, int col);
 
         /// <summary>
         /// Calculate the anomalies using dll functions for regression
@@ -369,27 +289,20 @@ namespace model
 
 
 
-            IntPtr tsNormal = createTS(learnNormalCsvToWork);
-            //create list of time anomaly
-            List<int> timeStepOfAnomaly = new List<int>();
+            TimeSeriesModel tsNormal = new TimeSeriesModel(learnNormalCsvToWork);
+          
             //create SimpleAnomalyDetector
-            IntPtr sad = createSad();
-
+            AnomalyReg sad = new AnomalyReg();
+        
             //The algorithm learns the normal file
-            SadLearnNormal(sad, tsNormal);
+            sad.LearnNormal(tsNormal);
             //The algorithm checks for anomalies in our file
-            IntPtr vectorAnomalyReport = SadDetect(sad, this.ts);
-            //size of vector reports
-            int sizeOfVector = reportSize(vectorAnomalyReport);
-            for(int i = 0; i< sizeOfVector;i++)
-            {
-                timeStepOfAnomaly.Add(reportGetAtIndex(vectorAnomalyReport, i));
-            }
-
-            SadDelete(sad);
-            List<int> uniqueLst = timeStepOfAnomaly.Distinct().ToList();
-            uniqueLst.Sort();
-            return uniqueLst;
+           
+            
+            List<int> l =  sad.Detect(this.ts);
+            sad.DestroyAnomaly();
+            return l;
+         
         }
         /// <summary>
         /// Calculate the anomalies using dll functions for Circle
@@ -418,31 +331,26 @@ namespace model
 
             Scattering.AddFirstLineInCsv(learnHibridCsv, learnHibridCsvToWork, this.firstLine);
 
-            //create ts to learnNormalCsv
-            IntPtr tsNormal = createTS(learnHibridCsvToWork);
-            //create list of time anomaly
-            List<int> timeStepOfAnomaly = new List<int>();
+            TimeSeriesModel tsNormal = new TimeSeriesModel(learnHibridCsvToWork);
+            
             //create SimpleAnomalyDetector
-            IntPtr had = createHad();
+            AnomalyCirc had = new AnomalyCirc();
+
+
+          
 
             //The algorithm learns the normal file
-            HadLearnNormal(had, tsNormal);
+            had.LearnNormal(tsNormal);
             //The algorithm checks for anomalies in our file
-            IntPtr vectorAnomalyReport = HadDetect(had, this.ts);
-            //size of vector reports
-            int sizeOfVector = reportSize(vectorAnomalyReport);
-            for (int i = 0; i < sizeOfVector; i++)
-            {
-                timeStepOfAnomaly.Add(reportGetAtIndex(vectorAnomalyReport, i));
-            }
-
-            HadDelete(had);
-            List<int> uniqueLst = timeStepOfAnomaly.Distinct().ToList();
-            uniqueLst.Sort();
-            return uniqueLst;
+            List<int> l = had.Detect(this.ts);
+            had.DestroyAnomaly();
+            return l;
         }
+        [DllImport("AP2Libraries.dll")]
+        public static extern int TsGetAttributesSize(IntPtr ts);
+      
 
-       
+
     }
 
 }
