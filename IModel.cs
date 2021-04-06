@@ -66,18 +66,13 @@ namespace FlightSimADVProg2_ex1.Model
         /// <returns></returns>
         List<string> GetListOfAttribute();
 
-        /// <summary>
-        /// returns list of anomalies based off of reg (SAD) 
-        /// </summary>
-        /// <param name="learnNormalCsv"></param>
-        /// <returns></returns>
-        List<int> AnomalyReg(string learnNormalCsv);
+      
         /// <summary>
         /// returns list of anomalies based off of circle (HAD)
         /// </summary>
         /// <param name="learnNormalCsv"></param>
         /// <returns></returns>
-        List<int> AnomalyCirc(string learnNormalCsv);
+        List<int> AnomalyAd(string learnNormalCsv);
 
 
 
