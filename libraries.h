@@ -10,6 +10,12 @@
 #include "timeseries.h"
 #include "HybridAnomalyDetector.h"
 #define EXPORT extern "C" __declspec(dllexport)
+
+//test
+EXPORT int testing() {
+	std::cout << "DLL WORKS" << endl;
+	return 1;
+}
 /*
 * 
 * 
@@ -67,28 +73,29 @@ EXPORT void TsDelete(TimeSeries* ts) {
 
 
 /*
-*
 * 
 * SimpleAnomalyDetector
 * 
 */
-EXPORT void* createSad() {
+
+EXPORT void* createAd() {
 	return (void*) new SimpleAnomalyDetector();
 }
-EXPORT void SadLearnNormal(SimpleAnomalyDetector * s, const TimeSeries & ts) {
+EXPORT void AdLearnNormal(SimpleAnomalyDetector * s, const TimeSeries & ts) {
 	s->learnNormal(ts);
 }
 
-EXPORT void SadDelete(SimpleAnomalyDetector* s) {
+EXPORT void AdDelete(SimpleAnomalyDetector* s) {
 	delete s;
 }
 
 //recieve as an IntPtr
-EXPORT  vector<AnomalyReport>* SadDetect(SimpleAnomalyDetector * s, const TimeSeries & ts) {
+EXPORT  vector<AnomalyReport>* AdDetect(SimpleAnomalyDetector * s, const TimeSeries & ts) {
 	vector<AnomalyReport>* v = new vector<AnomalyReport>();
 	*v = s->detect(ts);
 	return v;
 }
+
 
 //gets size of given anomaly report, ALSO WORKS FOR HYBRID!!!!
 EXPORT int reportSize(vector<AnomalyReport>* v) {
@@ -110,24 +117,26 @@ EXPORT void reportDelete(vector<AnomalyReport>* v) {
 * 
 * 
 */
-EXPORT void* createHad() {
+
+/*
+EXPORT void* createAd() {
 	return (void*) new HybridAnomalyDetector();
 }
-EXPORT void HadLearnNormal(HybridAnomalyDetector * h, const TimeSeries & ts) {
+EXPORT void AdLearnNormal(HybridAnomalyDetector * h, const TimeSeries & ts) {
 	h->learnNormal(ts);
 }
 //gives anomaly report. Make sure to delete when done and to access the report detaild, use report functions above
-EXPORT  vector<AnomalyReport>* HadDetect(HybridAnomalyDetector* h, const TimeSeries& ts) {
+EXPORT  vector<AnomalyReport>* AdDetect(HybridAnomalyDetector* h, const TimeSeries& ts) {
 	vector<AnomalyReport>* v = new vector<AnomalyReport>();
 	*v = h->detect(ts);
 	return v;
 }
 
-EXPORT void HadDelete(HybridAnomalyDetector * had) {
+EXPORT void AdDelete(HybridAnomalyDetector * had) {
 	delete had;
 
 }
-
+*/
 
 /*
 * 
