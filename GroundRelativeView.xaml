@@ -1,0 +1,111 @@
+﻿<UserControl x:Class="FlightSimADVProg2_ex1.SubViews.GroundRelativeView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:local="clr-namespace:FlightSimADVProg2_ex1.SubViews"
+			 mc:Ignorable="d" 
+			 d:DesignHeight="450" d:DesignWidth="600">
+	<Grid>
+		
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
+		
+		<Grid.RowDefinitions>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="2*"/>
+		</Grid.RowDefinitions>
+		
+		<!-- Setting up the Headers Height, Velocity, Heading deagree-->
+		<TextBox Name="HeightText" Text="Height" TextAlignment="Center" Grid.Row="0" 
+				 Foreground="LimeGreen" FontFamily="Arial Black">
+			<TextBox.Background>
+				<SolidColorBrush Opacity="0"/>
+			</TextBox.Background>
+			
+		</TextBox>
+		<TextBox Name="VelocityText" Text="Velocity" TextAlignment="Center" Grid.Row="1"
+				 Foreground="LimeGreen" FontFamily="Arial Black">
+			<TextBox.Background>
+				<SolidColorBrush Opacity="0"/>
+			</TextBox.Background>
+		</TextBox>
+		<TextBox Name="DegreeText" Text="Degree" TextAlignment="Center" Grid.Row="2"
+				 Foreground="LimeGreen" FontFamily="Arial Black">
+			<TextBox.Background>
+				<SolidColorBrush Opacity="0"/>
+			</TextBox.Background>
+		</TextBox>
+
+		
+		<!-- Corresponding Values to Height,Value,Degree -->
+        <TextBox Name="HeightValue" Text="{Binding VM_AltimeterIndicatedAltitudeFt}" TextAlignment="Center" Grid.Row="0" Grid.Column="1"
+				 Foreground="LimeGreen" FontFamily="Arial Black" TextChanged="HeightValue_TextChanged">
+			<TextBox.Background>
+				<SolidColorBrush Opacity="0"/>
+			</TextBox.Background>
+
+		</TextBox>
+		<TextBox Name="VelocityValue" Text="{Binding VM_Airspeedkt}" TextAlignment="Center" Grid.Row="1" Grid.Column="1"
+				 Foreground="LimeGreen" FontFamily="Arial Black" TextChanged="VelocityValue_TextChanged">
+			<TextBox.Background>
+				<SolidColorBrush Opacity="0"/>
+			</TextBox.Background>
+		</TextBox>
+        <TextBox Name="DegreeValue" Text="{Binding VM_IndicatedHeadingDeg}" TextAlignment="Center" Grid.Row="2" Grid.Column="1"
+				 Foreground="LimeGreen" FontFamily="Arial Black" TextChanged="DegreeValue_TextChanged">
+			<TextBox.Background>
+				<SolidColorBrush Opacity="0"/>
+			</TextBox.Background>
+		</TextBox>
+		
+		
+		<!-- We will represent the roll, yaw, pitch as progress bars-->
+		<Grid Grid.Row="3" Grid.ColumnSpan="2">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Name="YawText" Text="Yaw" TextAlignment="Center" Grid.Row="0"
+				 Foreground="LimeGreen" FontFamily="Arial Black">
+                <TextBox.Background>
+                    <SolidColorBrush Opacity="0"/>
+                </TextBox.Background>
+
+            </TextBox>
+            <TextBox Name="RollText" Text="Roll" TextAlignment="Center" Grid.Row="1"
+				 Foreground="LimeGreen" FontFamily="Arial Black" TextChanged="VelocityValue_TextChanged">
+                <TextBox.Background>
+                    <SolidColorBrush Opacity="0"/>
+                </TextBox.Background>
+            </TextBox>
+            <TextBox Name="PitchText" Text="Pitch" TextAlignment="Center" Grid.Row="2"
+				 Foreground="LimeGreen" FontFamily="Arial Black">
+                <TextBox.Background>
+                    <SolidColorBrush Opacity="0"/>
+                </TextBox.Background>
+            </TextBox>
+
+
+
+            <ProgressBar Grid.Column="1" Value="{Binding VM_PitchDeg}" ValueChanged="ProgressBar_ValueChanged"/>
+            <ProgressBar Grid.Column="1" Grid.Row="1" Value="{Binding VM_RollDeg}" ValueChanged="ProgressBar_ValueChanged_1"/>
+            <ProgressBar Grid.Column="1" Grid.Row="2" Value="{Binding VM_SideSlipDeg}" ValueChanged="ProgressBar_ValueChanged_2"/>
+        </Grid>
+
+
+	</Grid>
+			
+</UserControl>
