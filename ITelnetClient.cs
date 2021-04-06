@@ -30,6 +30,9 @@ namespace model
             // If a host has multiple addresses, you will get a list of addresses  
             try
             {
+
+              
+
                 IPHostEntry host = Dns.GetHostEntry(ip);
                 IPAddress ipAddress = host.AddressList[0];
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
@@ -78,7 +81,7 @@ namespace model
                 byte[] msg = Encoding.ASCII.GetBytes(command);
 
                 // Send the data through the socket.    
-                //////////////////int bytesSent = this.sender.Send(msg);
+               int bytesSent = this.sender.Send(msg);
                
                
             }
@@ -159,7 +162,8 @@ namespace model
             this.port = port;
            
             this.receiver  = new UdpClient();
-            this.receiver.Connect(IPAddress.Parse(ip) , this.port);
+            // this.receiver.Connect(IPAddress.Parse(ip) , this.port);
+            this.receiver.Connect(ip, this.port);
             return 0;
         }
         public void Write(string command)
