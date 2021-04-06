@@ -15,9 +15,9 @@ using System.Linq;
 
 namespace FlightSimADVProg2_ex1.Model
 {
-    partial class MyModel : IModel
+    partial class Model : IModel
     {
-
+       
 
         //private string fileCsv;
         /// <summary>
@@ -258,61 +258,15 @@ namespace FlightSimADVProg2_ex1.Model
 
 
 
-        [DllImport("AP2Libraries.dll")]
-        public static extern float varFromColIndex(IntPtr ts, int col);
-
-        /// <summary>
-        /// Calculate the anomalies using dll functions for regression
-        /// </summary>
-        /// <param name="learnNormalCsv">A path of a file for learning the algorithm</param>
-        /// <returns>list of anomalies based off of reg (SAD)</returns>
-        public List<int> AnomalyReg(string learnNormalCsv)
-        {
-            string learnNormalCsvToWork = "learnNormalCsvToWork.csv";
-            //create ts to learnNormalCsv
-            var lineCount = 0;
-            using (var reader = File.OpenText(learnNormalCsv))
-            {
-                while (reader.ReadLine() != null)
-                {
-                    lineCount++;
-                }
-            }
-           
-
-
-
-            string data = "";
-            File.WriteAllText(learnNormalCsvToWork, data);
-
-            Scattering.AddFirstLineInCsv(learnNormalCsv, learnNormalCsvToWork, this.firstLine);
-
-
-
-            TimeSeriesModel tsNormal = new TimeSeriesModel(learnNormalCsvToWork);
-          
-            //create SimpleAnomalyDetector
-            AnomalyReg sad = new AnomalyReg();
-        
-            //The algorithm learns the normal file
-            sad.LearnNormal(tsNormal);
-            //The algorithm checks for anomalies in our file
-           
-            
-            List<int> l =  sad.Detect(this.ts);
-            sad.DestroyAnomaly();
-            return l;
-         
-        }
         /// <summary>
         /// Calculate the anomalies using dll functions for Circle
         /// </summary>
         /// <param name="learnHibridCsv">A path of a file for learning the algorithm</param>
         /// <returns>list of anomalies based off of circle (HAD)</returns>
-        public List<int> AnomalyCirc(string learnHibridCsv)
+        public List<int> AnomalyAd(string learnHibridCsv)
         {
 
-            string learnHibridCsvToWork = "learnHibridCsvToWork.csv";
+            string learnHibridCsvToWork = "learnAdCsvToWork.csv";
             //create ts to learnNormalCsv
             var lineCount = 0;
             using (var reader = File.OpenText(learnHibridCsv))
@@ -334,20 +288,19 @@ namespace FlightSimADVProg2_ex1.Model
             TimeSeriesModel tsNormal = new TimeSeriesModel(learnHibridCsvToWork);
             
             //create SimpleAnomalyDetector
-            AnomalyCirc had = new AnomalyCirc();
+            AnomalyAd ad = new AnomalyAd();
 
 
           
 
             //The algorithm learns the normal file
-            had.LearnNormal(tsNormal);
+            ad.LearnNormal(tsNormal);
             //The algorithm checks for anomalies in our file
-            List<int> l = had.Detect(this.ts);
-            had.DestroyAnomaly();
+            List<int> l = ad.Detect(this.ts);
+            ad.DestroyAnomaly();
             return l;
         }
-        [DllImport("AP2Libraries.dll")]
-        public static extern int TsGetAttributesSize(IntPtr ts);
+        
       
 
 
