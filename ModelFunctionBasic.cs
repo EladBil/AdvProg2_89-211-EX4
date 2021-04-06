@@ -18,7 +18,7 @@ namespace FlightSimADVProg2_ex1.Model
 
 
 
-    partial class MyModel : IModel
+    partial class Model : IModel
     {
 
 
@@ -42,7 +42,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// constractor - Initializes the dictionary of speed
         /// </summary>
         /// <param name="telnetClient"></param>
-        public MyModel(ITelnetClient telnetClient)
+        public Model(ITelnetClient telnetClient)
         {
             this.telnetClientFlightGear = telnetClient;
             stop = false;
@@ -84,13 +84,6 @@ namespace FlightSimADVProg2_ex1.Model
         public void start()
         {
            
-
-
-            //need take rows from th eime series wait to shmoel
-            // IntPtr ts = CreateTs(this.fileCsv);
-
-
-
 
             new Thread(delegate ()
             {

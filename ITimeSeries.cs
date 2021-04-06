@@ -12,37 +12,37 @@ namespace FlightSimADVProg2_ex1.Model
     }
     class TimeSeriesModel: ITimeSeries
     {
-
-        [DllImport("AP2Libraries.dll")]
+       const string myDll = "SadDLL.dll";
+        [DllImport(myDll)]
         public static extern void TsDelete(IntPtr ts);
 
 
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern float covFromColIndex(IntPtr ts, int col1, int col2);
 
 
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern float varFromColIndex(IntPtr ts, int col);
 
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern float avgFromColIndex(IntPtr ts, int col);
 
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern int TsGetColSize(IntPtr ts);
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern float pearsonFromColIndex(IntPtr ts, int col1, int col2);
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern IntPtr TsGetColByIndex(IntPtr ts, int i);
 
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern IntPtr createTS(string CSVfileName);
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern IntPtr TsGetRow(IntPtr ts, int j);
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern float TsGetInRow(IntPtr row, int i);
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern int TsGetAttributesSize(IntPtr ts);
-        [DllImport("AP2Libraries.dll")]
+        [DllImport(myDll)]
         public static extern void TsDeleteRow(IntPtr row);
 
         IntPtr tsP;
