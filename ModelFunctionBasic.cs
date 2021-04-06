@@ -13,12 +13,12 @@ namespace FlightSimADVProg2_ex1.Model
     /// <summary>
     /// Interface for the model
     /// </summary>
-   
 
 
 
 
-    partial class Model : IModel
+
+    partial class MyModel : IModel
     {
 
 
@@ -29,7 +29,7 @@ namespace FlightSimADVProg2_ex1.Model
 
         public Boolean Stop
         {
-           
+
             set
             {
                 this.stop = value;
@@ -42,14 +42,14 @@ namespace FlightSimADVProg2_ex1.Model
         /// constractor - Initializes the dictionary of speed
         /// </summary>
         /// <param name="telnetClient"></param>
-        public Model(ITelnetClient telnetClient)
+        public MyModel(ITelnetClient telnetClient)
         {
             this.telnetClientFlightGear = telnetClient;
             stop = false;
 
             this.speedToMilliseconds = new Dictionary<float, int>();
             speedToMilliseconds.Add(0, 500);
-            speedToMilliseconds.Add((float)0.25,300 );
+            speedToMilliseconds.Add((float)0.25, 300);
             speedToMilliseconds.Add((float)0.5, 200);
             speedToMilliseconds.Add(1, 100);
             speedToMilliseconds.Add((float)1.25, 85);
@@ -83,11 +83,11 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         public void start()
         {
-           
+
 
             new Thread(delegate ()
             {
-                
+
                 while (!stop)
                 {
 
@@ -95,19 +95,19 @@ namespace FlightSimADVProg2_ex1.Model
 
                     string line;
 
-
-                    this.arrayRowNow = ts.TsGetRow(IndexFrame);
-                   
-
-                   // convert vectorFloat from dll to arrayFloat in c#
                     
-               
-                        this.updateAllattributes(arrayRowNow);
-                        line = String.Join(",", arrayRowNow);
+                    this.arrayRowNow = ts.TsGetRow(IndexFrame);
 
 
-                                  telnetClientFlightGear.Write(line);
-                   
+                    // convert vectorFloat from dll to arrayFloat in c#
+
+
+                    this.updateAllattributes(arrayRowNow);
+                    line = String.Join(",", arrayRowNow);
+
+
+                    telnetClientFlightGear.Write(line);
+
                     IndexFrame++;
                     Console.WriteLine(IndexFrame);
 
@@ -120,7 +120,7 @@ namespace FlightSimADVProg2_ex1.Model
 
 
             }).Start();
-           
+
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace FlightSimADVProg2_ex1.Model
             RollDeg = arrayValue[this.DictValuesToNumInCsv["roll-deg"]];
             PitchDeg = arrayValue[this.DictValuesToNumInCsv["pitch-deg"]];
             HeadingDeg = arrayValue[this.DictValuesToNumInCsv["heading-deg"]];
-            
+
             SideSlipDeg = arrayValue[this.DictValuesToNumInCsv["side-slip-deg"]];
             AirspeedKt = arrayValue[this.DictValuesToNumInCsv["airspeed-kt"]];
             Glideslope = arrayValue[this.DictValuesToNumInCsv["glideslope"]];
@@ -161,7 +161,7 @@ namespace FlightSimADVProg2_ex1.Model
             AttitudeIndicatorIndicatedPitchDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_indicated-pitch-deg"]];
             AttitudeIndicatorIndicatedRollDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_indicated-roll-deg"]];
             AttitudeIndicatorInternalPitchDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_internal-pitch-deg"]];
-            
+
             AttitudeIndicatorInternalRollDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_internal-roll-deg"]];
             EncoderIndicatedAltitudeFt = arrayValue[this.DictValuesToNumInCsv["encoder_indicated-altitude-ft"]];
             EncoderPressureAltFt = arrayValue[this.DictValuesToNumInCsv["encoder_pressure-alt-ft"]];
@@ -172,7 +172,7 @@ namespace FlightSimADVProg2_ex1.Model
             MagneticCompassIndicatedHeadingDeg = arrayValue[this.DictValuesToNumInCsv["magnetic-compass_indicated-heading-deg"]];
             SlipSkidBallIndicatedSlipSkid = arrayValue[this.DictValuesToNumInCsv["slip-skid-ball_indicated-slip-skid"]];
             TurnIndicatorIndicatedTurnRate = arrayValue[this.DictValuesToNumInCsv["turn-indicator_indicated-turn-rate"]];
-           
+
             VerticalSpeedIndicatorIndicatedSpeedFpm = arrayValue[this.DictValuesToNumInCsv["vertical-speed-indicator_indicated-speed-fpm"]];
             EngineRpm = arrayValue[this.DictValuesToNumInCsv["engine_rpm"]];
 
@@ -189,7 +189,7 @@ namespace FlightSimADVProg2_ex1.Model
                 millisecondsTimeout = value;
             }
         }
-        
+
 
 
 
@@ -668,5 +668,5 @@ namespace FlightSimADVProg2_ex1.Model
 
 
 
-        
+
 }

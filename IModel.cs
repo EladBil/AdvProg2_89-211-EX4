@@ -66,7 +66,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// <returns></returns>
         List<string> GetListOfAttribute();
 
-      
+
         /// <summary>
         /// returns list of anomalies based off of circle (HAD)
         /// </summary>
@@ -74,6 +74,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// <returns></returns>
         List<int> AnomalyAd(string learnNormalCsv);
 
+        public void start();
 
 
         /*

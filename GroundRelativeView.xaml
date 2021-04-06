@@ -50,7 +50,7 @@
 			</TextBox.Background>
 
 		</TextBox>
-		<TextBox Name="VelocityValue" Text="{Binding VM_Airspeedkt}" TextAlignment="Center" Grid.Row="1" Grid.Column="1"
+		<TextBox Name="VelocityValue" Text="{Binding VM_AirspeedKt}" TextAlignment="Center" Grid.Row="1" Grid.Column="1"
 				 Foreground="LimeGreen" FontFamily="Arial Black" TextChanged="VelocityValue_TextChanged">
 			<TextBox.Background>
 				<SolidColorBrush Opacity="0"/>

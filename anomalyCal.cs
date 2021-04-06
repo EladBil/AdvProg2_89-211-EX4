@@ -4,9 +4,9 @@ using System.Text;
 
 namespace FlightSimADVProg2_ex1.Model
 {
-    class anomaly
-    {
-        public static float avg(List<float> x)
+	class anomaly
+	{
+		public static float avg(List<float> x)
 		{
 			float sum = 0;
 			for (int i = 0; i < x.Count; sum += x[i], i++) ;
@@ -18,7 +18,7 @@ namespace FlightSimADVProg2_ex1.Model
 		{
 			float av = avg(x);
 			float sum = 0;
-			for (int i = 0; i <x.Count; i++)
+			for (int i = 0; i < x.Count; i++)
 			{
 				sum += x[i] * x[i];
 			}

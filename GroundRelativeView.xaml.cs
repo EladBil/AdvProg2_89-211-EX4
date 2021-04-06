@@ -21,13 +21,18 @@ namespace FlightSimADVProg2_ex1.SubViews
     /// </summary>
     public partial class GroundRelativeView : UserControl
     {
-        VM_Mission5 vm;
+        VM_Mission5 vm5;
+        VM_Start vmstart;
 
         public GroundRelativeView()
         {
             InitializeComponent();
-            vm = new VM_Mission5(new MyModel(new MyTelnetFlightGearClientUDP()));
-            DataContext = vm;
+            MyModel mm = new MyModel(new MyTelnetFlightGearClientUDP());
+            vmstart = new VM_Start(mm);
+            vmstart.VM_LetsStart("reg_flight.csv", "playback_small.xml");
+            vm5 = new VM_Mission5(mm);
+           
+            DataContext = vm5;
         }
 
         private void VelocityValue_TextChanged(object sender, TextChangedEventArgs e)

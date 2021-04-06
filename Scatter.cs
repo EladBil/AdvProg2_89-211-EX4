@@ -28,15 +28,15 @@ namespace FlightSimADVProg2_ex1.Model
             foreach (XmlNode xn in xnList)
             {
 
-               
+
 
 
                 string firstName = xn["name"].InnerText;
 
-                if (myDict.ContainsKey(firstName)) 
+                if (myDict.ContainsKey(firstName))
                 {
-                    firstName =  String.Concat(firstName, "2");
-                   
+                    firstName = String.Concat(firstName, "2");
+
                 }
 
                 myDict.Add(firstName, i);
@@ -65,9 +65,9 @@ namespace FlightSimADVProg2_ex1.Model
                 }
                 i++;
                 string firstName = xn["name"].InnerText;
-                
+
                 builder.Append(firstName);
-               
+
 
                 //Console.WriteLine(firstName);
             }
@@ -88,7 +88,7 @@ namespace FlightSimADVProg2_ex1.Model
          */
         public static void AddFirstLineInCsv(string filePathOld, string filePathNew, string csvLine)
         {
-           
+
             // string filePathOld = @"C:\Test\test.csv";
             //string csvLine = "value1; value2; value3" + Environment.NewLine;
             byte[] csvLineBytes = Encoding.Default.GetBytes(csvLine);
@@ -107,10 +107,10 @@ namespace FlightSimADVProg2_ex1.Model
             }
         }
 
-        public static string CreateDictionaryFromStringCSV(Dictionary<string , int> myDict ,  string csvLine)
+        public static string CreateDictionaryFromStringCSV(Dictionary<string, int> myDict, string csvLine)
         {
             string[] words = csvLine.Split(',');
-            
+
 
             for (int i = 0; i < words.GetLength(0); i++)
             {

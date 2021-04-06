@@ -10,11 +10,11 @@ namespace FlightSimADVProg2_ex1.Model
 
     interface IAnomalAlgorithms
     {
- 
+
 
     }
 
-    class AnomalyAd: IAnomalAlgorithms
+    class AnomalyAd : IAnomalAlgorithms
     {
         const string myDll = "SadDLL.dll";
 
@@ -44,7 +44,7 @@ namespace FlightSimADVProg2_ex1.Model
         }
         public List<int> Detect(TimeSeriesModel ts)
         {
-            
+
             List<int> timeStepOfAnomaly = new List<int>();
             IntPtr vectorAnomalyReport = AdDetect(this.had, ts.GetIntP());
 
@@ -64,7 +64,7 @@ namespace FlightSimADVProg2_ex1.Model
             List<int> uniqueLst = timeStepOfAnomaly.Distinct().ToList();
             uniqueLst.Sort();
 
-          
+
             return uniqueLst;
         }
         public void LearnNormal(TimeSeriesModel ts)
@@ -73,7 +73,7 @@ namespace FlightSimADVProg2_ex1.Model
 
             AdLearnNormal(this.had, ts.GetIntP());
 
-            
+
         }
 
         public void DestroyAnomaly()
