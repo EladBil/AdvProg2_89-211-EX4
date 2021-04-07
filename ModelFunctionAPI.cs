@@ -15,9 +15,21 @@ using System.Linq;
 
 namespace FlightSimADVProg2_ex1.Model
 {
-    partial class Model : IModel
+    class MiliSecondAndRate
     {
+        public MiliSecondAndRate(int MiliSeconds, int Rate)
+        {
+            this.MiliSeconds = MiliSeconds;
+            this.Rate = Rate;
+        }
+        public int MiliSeconds { get; set; }
+        public int Rate { get; set; }
+
        
+    }
+    partial class MyModel : IModel
+    {
+
 
         //private string fileCsv;
         /// <summary>
@@ -28,7 +40,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// The delay time between pulling lines of the ts
         /// </summary>
         private int millisecondsTimeout = 100;
-     
+
         /// <summary>
         /// The same file is sent to timeseries plus a row of attribute names
         ///In order not to change the current file
@@ -42,7 +54,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// Will hold the api file name
         /// </summary>
         private string fileAPI = "";
-      
+
         /// <summary>
         /// Holds the number of rows (without the attribute names) of the csv file
         /// </summary>
@@ -64,9 +76,9 @@ namespace FlightSimADVProg2_ex1.Model
         /// The dictionary "speedToMilliseconds" links the number of speeds to the number of milliseconds 
         /// that the thread will rest between each pull of a row from timeseries
         /// </summary>
-        private Dictionary<float, int> speedToMilliseconds;
+        private Dictionary<float, MiliSecondAndRate> speedToMillisecondAndRate;
 
-        
+
         /// <summary>
         /// "DictValuesToNumInCsv" - map between the values and their column number in the csv file
         /// </summary>
@@ -78,7 +90,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         private TimeSeriesModel ts;
 
-       
+
 
 
 
@@ -93,7 +105,7 @@ namespace FlightSimADVProg2_ex1.Model
             this.DictValuesToNumInCsv = new Dictionary<string, int>();
 
             this.firstLine = Scattering.CreateDictionaryFromStringCSV(this.DictValuesToNumInCsv, this.firstLine);
-          
+
             return 0;
         }
         /// <summary>
@@ -107,16 +119,16 @@ namespace FlightSimADVProg2_ex1.Model
         public int LoadingCSV(string PathFileCSV)
         {
 
-             string data = "";
+            string data = "";
             File.WriteAllText(this.fileCsvToWork, data);
-            
+
             Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
-            
-            this.ts =  new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
-         
+
+            this.ts = new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
+
             return 0;
         }
-        
+
 
         /// <summary>This method return number of rows of csv file Without the first line of attribute</summary>
         ///<returns>number of rows of csv file Without the first line of attribute</returns>
@@ -125,7 +137,7 @@ namespace FlightSimADVProg2_ex1.Model
             //return TsGetColSize(this.ts);
             return this.countRows;
         }
-       
+
         /// <summary>
         /// return the speed of send Of sending the data
         /// Speed is milliseconds and the process stops between sending
@@ -145,12 +157,12 @@ namespace FlightSimADVProg2_ex1.Model
         /// <param name="speed"></param>
         public void SetRefreshRate(float speed)
         {
-            if (this.speedToMilliseconds.ContainsKey(speed))
+            if (this.speedToMillisecondAndRate.ContainsKey(speed))
             {
                 this.speed = speed;
-                this.millisecondsTimeout = this.speedToMilliseconds[speed];
+                this.millisecondsTimeout = this.speedToMillisecondAndRate[speed].MiliSeconds;
             }
-           
+
         }
 
 
@@ -160,7 +172,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// <param name="p">pointer to vector of float from dll</param>
         /// <param name="size"> the size of vector</param>
         /// <returns>list of float</returns>
-      
+
         public List<float> GetValuesSpecificAttribute(string attribute)
         {
             int numberCol = this.DictValuesToNumInCsv[attribute];
@@ -198,17 +210,18 @@ namespace FlightSimADVProg2_ex1.Model
             {
                 float tempCor = 0;
                 //Skip the feature itself
-                if (attribute2.Key.Equals(givenIndex)){
+                if (attribute2.Key.Equals(givenIndex))
+                {
                     continue;
                 }
                 tempCor = ts.pearsonFromColIndex(atrribute1, attribute2.Value);
-                if (Math.Abs(tempCor)>= Math.Abs(corMost))
+                if (Math.Abs(tempCor) >= Math.Abs(corMost))
                 {
                     nameOfMostCor = attribute2.Key;
                     corMost = tempCor;
                 }
             }
-           
+
             return nameOfMostCor;
         }
 
@@ -223,12 +236,12 @@ namespace FlightSimADVProg2_ex1.Model
         /// <returns>Line of reg</returns>
         public Line lineReg(string value1, string value2)
         {
-           
+
             int x = this.DictValuesToNumInCsv[value1];
             int y = this.DictValuesToNumInCsv[value2];
 
 
-            return ts.lineReg(x,y);
+            return ts.lineReg(x, y);
         }
         /// <summary>
         /// GetListOfAttribute -  return list of Attributes (values) 
@@ -276,7 +289,7 @@ namespace FlightSimADVProg2_ex1.Model
                     lineCount++;
                 }
             }
-            
+
 
 
 
@@ -286,12 +299,12 @@ namespace FlightSimADVProg2_ex1.Model
             Scattering.AddFirstLineInCsv(learnHibridCsv, learnHibridCsvToWork, this.firstLine);
 
             TimeSeriesModel tsNormal = new TimeSeriesModel(learnHibridCsvToWork);
-            
+
             //create SimpleAnomalyDetector
             AnomalyAd ad = new AnomalyAd();
 
 
-          
+
 
             //The algorithm learns the normal file
             ad.LearnNormal(tsNormal);
@@ -300,12 +313,11 @@ namespace FlightSimADVProg2_ex1.Model
             ad.DestroyAnomaly();
             return l;
         }
-        
-      
+
+
 
 
     }
 
 }
-
 

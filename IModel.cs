@@ -66,7 +66,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// <returns></returns>
         List<string> GetListOfAttribute();
 
-      
+
         /// <summary>
         /// returns list of anomalies based off of circle (HAD)
         /// </summary>
@@ -74,7 +74,8 @@ namespace FlightSimADVProg2_ex1.Model
         /// <returns></returns>
         List<int> AnomalyAd(string learnNormalCsv);
 
-
+        public void start();
+        public void start(string ip, int port);
 
         /*
          * get most cor receives a field (thats on a csv) and returns which one of the other fields are the most corralitive from the 
