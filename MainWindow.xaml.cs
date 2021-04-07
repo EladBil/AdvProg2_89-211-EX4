@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using FlightSimADVProg2_ex1.ViewModels;
+
 namespace FlightSimADVProg2_ex1
 {
     /// <summary>
