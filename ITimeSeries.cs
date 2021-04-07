@@ -10,9 +10,9 @@ namespace FlightSimADVProg2_ex1.Model
     {
 
     }
-    class TimeSeriesModel: ITimeSeries
+    class TimeSeriesModel : ITimeSeries
     {
-       const string myDll = "SadDLL.dll";
+        const string myDll = "SadDLL.dll";
         [DllImport(myDll)]
         public static extern void TsDelete(IntPtr ts);
 
@@ -44,19 +44,21 @@ namespace FlightSimADVProg2_ex1.Model
         public static extern int TsGetAttributesSize(IntPtr ts);
         [DllImport(myDll)]
         public static extern void TsDeleteRow(IntPtr row);
+        [DllImport(myDll)]
+        public static extern int testing();
 
         IntPtr tsP;
         IntPtr rowNow;
         private int amountAttribute = 0;
-     
+
         private int amountLines = 0;
         public TimeSeriesModel(string path)
         {
             this.tsP = createTS(path);
-            this.rowNow = TsGetRow(this.tsP , 0);
+            this.rowNow = TsGetRow(this.tsP, 0);
             this.amountAttribute = TsGetAttributesSize(this.tsP);
             this.amountLines = TsGetColSize(this.tsP);
-            
+
 
 
         }
@@ -69,7 +71,7 @@ namespace FlightSimADVProg2_ex1.Model
         public float[] TsGetRow(int indexFrame)
         {
             float[] arrayValue = new float[this.AmountAttribute()];
-           
+
             TsDeleteRow(this.rowNow);
             this.rowNow = TsGetRow(this.tsP, indexFrame);
 
@@ -80,7 +82,7 @@ namespace FlightSimADVProg2_ex1.Model
             }
             return arrayValue;
         }
-       
+
 
         public int AmountAttribute()
         {
@@ -100,7 +102,7 @@ namespace FlightSimADVProg2_ex1.Model
         }
         public List<float> GetValuesSpecificAttribute(int numberCol)
         {
-          
+
             IntPtr intPtr = TsGetColByIndex(this.tsP, numberCol);
             List<float> l = vectorFromIntPtrToList(intPtr, this.AmountLines());
             TsDeleteRow(intPtr);
@@ -110,7 +112,7 @@ namespace FlightSimADVProg2_ex1.Model
         {
             return TsGetInRow(rowNow, indexAttribute);
         }
-        
+
         public float varFromColIndex(int indexCol)
         {
             return varFromColIndex(this.tsP, indexCol);
@@ -119,14 +121,14 @@ namespace FlightSimADVProg2_ex1.Model
         {
             return avgFromColIndex(this.tsP, indexCol);
         }
-        public float covFromColIndex(int indexCol1 , int indexCol2)
+        public float covFromColIndex(int indexCol1, int indexCol2)
         {
             return covFromColIndex(this.tsP, indexCol1, indexCol2);
         }
 
         public Line lineReg(int x, int y)
         {
-            float a = covFromColIndex(x,y) / varFromColIndex(x);
+            float a = covFromColIndex(x, y) / varFromColIndex(x);
             float b = avgFromColIndex(y) - a * avgFromColIndex(x);
 
             return new Line(a, b);
