@@ -24,37 +24,53 @@ namespace FlightSimADVProg2_ex1.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propName)
         {
-            this?.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
         //altimeter
         public float VM_AltimeterIndicatedAltitudeFt
         {
             get { return model.AltimeterIndicatedAltitudeFt; }
+            set { model.AltimeterIndicatedAltitudeFt = value; }
         }
         //airspeed
         public float VM_AirspeedKt
         {
             get { return model.AirspeedKt; }
+            set { model.AirspeedKt = value; }
         }
         //direction
         public float VM_IndicatedHeadingDeg
         {
             get { return model.IndicatedHeadingDeg; }
+            set { model.IndicatedHeadingDeg = value; }
         }
         //pitch deg
         public float VM_PitchDeg
         {
             get { return model.PitchDeg; }
+            set
+            {
+                model.PitchDeg = value;
+            } 
         }
         //roll deg
         public float VM_RollDeg
         {
-            get { return model.RollDeg; }
+            get {
+                return model.RollDeg; }
+            set
+            {
+                model.RollDeg = value;
+            }
         }
         //yaw
         public float VM_SideSlipDeg
         {
             get { return model.SideSlipDeg; }
+            set { model.SideSlipDeg = value; }
         }
     }
 }

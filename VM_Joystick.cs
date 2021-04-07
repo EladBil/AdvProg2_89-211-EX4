@@ -24,7 +24,10 @@ namespace FlightSimADVProg2_ex1.SubViews
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propName)
         {
-            this?.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
         //returns the throttle_1
         public double VM_Throttle1

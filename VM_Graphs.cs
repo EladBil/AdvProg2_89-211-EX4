@@ -26,7 +26,10 @@ namespace AP2
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propName)
         {
-            this?.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
         //returns list of attributes
         public List<string> VM_Attributes

@@ -48,7 +48,10 @@ namespace FlightSimADVProg2_ex1.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propName)
         {
-            this?.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
         //returns how many rows there are in csv. Good for knowing how big the scroll bar should be
         public int VM_GetNumberRows

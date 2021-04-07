@@ -22,7 +22,10 @@ namespace AP2
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propName)
         {
-            this?.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
         //returns list of timesteps of regular anomalies
         public List<int> VM_AnomalyAd(string learnNormalCsv)

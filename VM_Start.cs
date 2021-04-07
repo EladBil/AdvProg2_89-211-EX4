@@ -7,7 +7,7 @@ using System.Text;
 using System.ComponentModel;
 using FlightSimADVProg2_ex1.Model;
 
-namespace AP2
+namespace FlightSimADVProg2_ex1.ViewModels
 {
     class VM_Start : INotifyPropertyChanged
     {
@@ -24,17 +24,26 @@ namespace AP2
         public event PropertyChangedEventHandler PropertyChanged;
         public void NotifyPropertyChanged(string propName)
         {
-            this?.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
         //load the API upon start of program
-        public void VM_loadingAPI(string fileAPI)
+        private void VM_loadingAPI(string fileAPI)
         {
             model.LoadingAPI(fileAPI);
         }
         //load the CSV upon start of program
-        public void VM_LoadingCSV(string fileCSV)
+        private void VM_LoadingCSV(string fileCSV)
         {
             model.LoadingCSV(fileCSV);
+        }
+        public void VM_LetsStart(string fileCSV, string fileAPI)
+        {
+            VM_LoadingCSV(fileCSV);
+            VM_loadingAPI(fileAPI);
+            model.start();
         }
     }
 }
