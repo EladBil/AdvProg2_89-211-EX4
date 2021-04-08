@@ -17,9 +17,9 @@ namespace AP2
         //most correlated feature
         private string cor;
         //colomn of chosen feature
-        private List<float> chosenVal;
+        private double[] chosenVal;
         //colomn of corelated feature
-        private List<float> corVal;
+        private double[] corVal;
 
         private IModel model;
 
@@ -40,6 +40,15 @@ namespace AP2
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
             }
         }
+        //returns the frame we are currently looking at
+        public int VM_IndexFrame
+        {
+            get { return model.IndexFrame; }
+            set
+            {
+                model.IndexFrame = value;
+            }
+        }
         public string VM_Chosen
         {
             get { return this.chosen; }
@@ -50,9 +59,9 @@ namespace AP2
                 //update the most correlated feature
                 VM_Cor = model.GetMostCor(chosen);
                 //update the row of the chosen feature
-                VM_ChosenVal = model.GetValuesSpecificAttribute(chosen);
+                VM_ChosenVal = FromListToArray(model.GetValuesSpecificAttribute(chosen));
                 //update the row of the most correlated feature
-                VM_CorVal = model.GetValuesSpecificAttribute(VM_Cor);
+                VM_CorVal = CorChange(model.GetValuesSpecificAttribute(VM_Cor));
                 NotifyPropertyChanged("VM_Chosen");
             }
         }
@@ -62,10 +71,14 @@ namespace AP2
             set
             {
                 cor = value;
+                if (cor.Equals("-1"))
+                {
+                    cor = "No Correlated Feature";
+                }
                 NotifyPropertyChanged("VM_Cor");
             }
         }
-        public List<float> VM_ChosenVal
+        public double[] VM_ChosenVal
         {
             get { return chosenVal; }
             set
@@ -75,7 +88,7 @@ namespace AP2
             }
 
         }
-        public List<float> VM_CorVal
+        public double[] VM_CorVal
         {
             get { return corVal; }
             set
@@ -108,6 +121,41 @@ namespace AP2
         public int VM_GetNumberRows()
         {
             return model.GetNumberRows();
+        }
+        //returns array of 0's
+        private double[] ZeroFillArray()
+        {
+
+            int j = VM_GetNumberRows();
+            double[] array = new double[j];
+            for (int i = 0; i < j; i++)
+            {
+                array[i] = 0;
+            }
+            return array;
+        }
+
+        //returns an array created from list
+        private double[] FromListToArray(List<float> list)
+        {
+            double[] array = new double[VM_GetNumberRows()];
+            int i = 0;
+            foreach (float value in list)
+            {
+                array[i] = (double)value;
+                i++;
+            }
+            return array;
+        }
+        //retruns the array of most correlated feature
+        private double[] CorChange(List<float> list)
+        {
+            //if there isnt a correlated feature return an empty array
+            if (VM_Cor.Equals("No Correlated Feature"))
+            {
+                return ZeroFillArray();
+            }
+            return FromListToArray(list);
         }
     }
 }

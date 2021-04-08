@@ -25,7 +25,7 @@ namespace FlightSimADVProg2_ex1.ViewModels
                 NotifyPropertyChanged("VM_" + e.PropertyName);
             };
         }
-        //getter and setter for index frame
+        //returns the frame we are currently looking at
         public int VM_IndexFrame
         {
             get { return model.IndexFrame; }
@@ -57,6 +57,8 @@ namespace FlightSimADVProg2_ex1.ViewModels
         public int VM_GetNumberRows
         {
             get { return model.GetNumberRows(); }
+            set { }
         }
+
     }
 }
