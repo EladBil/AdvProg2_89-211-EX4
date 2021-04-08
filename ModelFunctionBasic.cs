@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Net.Sockets;
+using System.Diagnostics;
 
 namespace FlightSimADVProg2_ex1.Model
 {
@@ -46,7 +47,7 @@ namespace FlightSimADVProg2_ex1.Model
         {
             this.telnetClientFlightGear = telnetClient;
             stop = false;
-
+            
             this.speedToMillisecondAndRate = new Dictionary<float, MiliSecondAndRate>();
             speedToMillisecondAndRate.Add(0, new MiliSecondAndRate(500 , 2));
             speedToMillisecondAndRate.Add((float)0.25, new MiliSecondAndRate(250, 4));
@@ -66,7 +67,10 @@ namespace FlightSimADVProg2_ex1.Model
         {
             this.ip = ip;
             this.port = port;
+      
             this.telnetClientFlightGear.Connect(this.ip, this.port);
+        
+
         }
         /// <summary>
         /// disconnect from flight gear
@@ -83,10 +87,10 @@ namespace FlightSimADVProg2_ex1.Model
         public void start(string ip , int port)
         {
 
-
+            TcpClient client = new TcpClient(ip, port);
             new Thread(delegate ()
             {
-                TcpClient client = new TcpClient(ip, port);
+               
                 NetworkStream stream = client.GetStream();
                 while (!stop)
                 {
@@ -101,11 +105,15 @@ namespace FlightSimADVProg2_ex1.Model
                     stream.Write(data, 0, data.Length);
                     //telnetClientFlightGear.Write(line);
                     IndexFrame++;
-                    //Console.WriteLine(IndexFrame);
-                    //Console.WriteLine(line);
+                   
                     Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
+                    if (IndexFrame >= this.countRows)
+                    {
+                        stop = true;
+
+                    }
                 }
-                //telnetClientFlightGear.Disconnect();
+            
 
                 client.Close();
             }).Start();
@@ -117,10 +125,10 @@ namespace FlightSimADVProg2_ex1.Model
 
             new Thread(delegate ()
             {
-              
+                
                 while (!stop)
                 {
-                  
+                    
 
                     this.arrayRowNow = ts.TsGetRow(IndexFrame);
                     // convert vectorFloat from dll to arrayFloat in c#
@@ -128,9 +136,15 @@ namespace FlightSimADVProg2_ex1.Model
                  
  
                     IndexFrame++;
-                    //Console.WriteLine(IndexFrame);
-                    //Console.WriteLine("[{0}]", string.Join(", ", this.arrayRowNow));
+                 
                     Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
+                   
+                    if (IndexFrame >= this.countRows)
+                    {
+                        stop = true;
+                        
+                    }
+
                 }
                 //telnetClientFlightGear.Disconnect();
 

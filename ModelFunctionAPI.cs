@@ -12,6 +12,7 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace FlightSimADVProg2_ex1.Model
 {
@@ -90,7 +91,8 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         private TimeSeriesModel ts;
 
-
+       
+      
 
 
 
@@ -125,7 +127,7 @@ namespace FlightSimADVProg2_ex1.Model
             Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
 
             this.ts = new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
-
+            this.countRows = this.ts.AmountLines();
             return 0;
         }
 
