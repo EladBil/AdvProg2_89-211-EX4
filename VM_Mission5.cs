@@ -57,13 +57,12 @@ namespace FlightSimADVProg2_ex1.ViewModels
             } 
         }
         //roll deg
-        public float VM_RollDeg
+        public double VM_RollDeg
         {
-            get {
-                return model.RollDeg; }
+            get {return model.RollDeg; }
             set
             {
-                model.RollDeg = value;
+                model.RollDeg = (float) value;
             }
         }
         //yaw
