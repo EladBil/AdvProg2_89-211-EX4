@@ -41,8 +41,8 @@ namespace FlightSimADVProg2_ex1.ViewModels
         }
         public void VM_LetsStart(string fileCSV, string fileAPI)
         {
-            VM_LoadingCSV(fileCSV);
             VM_loadingAPI(fileAPI);
+            VM_LoadingCSV(fileCSV);
             model.start();
         }
     }
