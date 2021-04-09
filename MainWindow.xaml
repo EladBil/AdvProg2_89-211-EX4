@@ -8,6 +8,11 @@
         Title="MainWindow" Height="450" Width="800"
         xmlns:controls="clr-namespace:FlightSimADVProg2_ex1.SubViews">
     <Grid>
-        <controls:GroundRelativeView/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <controls:GraphsView Loaded="GraphsView_Loaded" x:Name="GraphsView"/>
+        <controls:GroundRelativeView x:Name="GroundRelativeView" Grid.Column="1" Loaded="GroundRelativeView_Loaded"/>
     </Grid>
 </Window>
