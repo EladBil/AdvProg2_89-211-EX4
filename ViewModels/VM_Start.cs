@@ -86,11 +86,13 @@ namespace FlightSimADVProg2_ex1.ViewModels
             // After calling LoadCSV we have the all the values of the attributes of the flight.
             // And we have the number of Frames.
             LoadCSV(CSVFileName);
+            VMGraphs.Initialize();
+            VM_GroundRelativeView.Initialize();
         }
 
         public void Start()
         {
-            throw new NotImplementedException();
+            this.model.start();
         }
     }
 }

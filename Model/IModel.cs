@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FlightSimADVProg2_ex1.Model
 {
-    interface IModel : INotifyPropertyChanged
+    public interface IModel : INotifyPropertyChanged
     {
 
         /// <summary>

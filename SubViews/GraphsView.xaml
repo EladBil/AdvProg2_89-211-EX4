@@ -21,7 +21,7 @@
 
         <!-- Showing all the Paramets who are "choosable" -->
         <ListBox x:Name="FlightParameterList" Background="Yellow" SelectionChanged="FlightParameterList_SelectionChanged" 
-                 ItemsSource="{Binding VM_Attributes}" ScrollViewer.VerticalScrollBarVisibility="Visible" 
+                 ItemsSource="{Binding VM_AttributesNames}" ScrollViewer.VerticalScrollBarVisibility="Visible" 
                  Grid.Column="0" Grid.Row="1" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -33,7 +33,7 @@
         </ListBox>
 
         <!-- WpfPlot Name="ChosenParamGraph" Loaded="ChosenParamGraph_Loaded" -->
-        <WpfPlot Name="ParamAndCoorelativeGraph" Loaded="ParamAndCoorelativeGraph_Loaded" 
+        <WpfPlot Name="ParamAndCorrelativeGraph" Loaded="ParamAndCoorelativeGraph_Loaded" 
                  Grid.Column="1" Grid.RowSpan="2"/>
     
     </Grid>

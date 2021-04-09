@@ -23,23 +23,28 @@ namespace FlightSimADVProg2_ex1
     /// </summary>
     public partial class MainWindow : Window
     {
-        MyModel UnifedModel;
         VM_Start VMStart;
 
         public MainWindow()
         {
             InitializeComponent();
-            UnifedModel = new MyModel(new MyTelnetFlightGearClientTCP());
+            VMStart = new VM_Start();
+            VMStart.VM_APIFileName = "playback_small.xml";
+            VMStart.VM_CSVFileName = "reg_flight.csv";
+            GraphsView.GivenGraphsViewModel = this.VMStart.VM_Graphs;
+            GroundRelativeView.GivenGroundRelativeViewModel = this.VMStart.VM_GroundRelativeView;
+            VMStart.Initialize();
+            VMStart.Start();
         }
 
         private void GroundRelativeView_Loaded(object sender, RoutedEventArgs e)
         {
-            GroundRelativeView.VMMODEL = UnifedModel;
+            
         }
 
         private void GraphsView_Loaded(object sender, RoutedEventArgs e)
         {
-            GraphsView.VMMODEL = UnifedModel;
+            
         }
     }
 }

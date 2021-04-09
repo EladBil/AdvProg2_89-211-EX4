@@ -14,10 +14,12 @@ namespace FlightSimADVProg2_ex1.SubViews
     /// </summary>
     public partial class GraphsView : UserControl
     {
-        GraphsViewModel vm;
         const string MAINGRAPHNAME = "Value/Frame";
-        const string CORRELATIVEPROPERTYNAME = "VM_CorVal";
         const string INDEXFRAMEPROPERTY = "VM_indexFrame";
+        const string DEFAULT_DIDNT_CHOOSE = "Default: PleaseChoose!";
+        const int DEFAULT_MAX_RENDER = 30;
+        const int DEFAULT_MIN_RENDER = 0;
+
         int NumOfFrames;
         double[] ArrayOfFrameNumbers;
         double[] DefaultArray;
@@ -29,26 +31,16 @@ namespace FlightSimADVProg2_ex1.SubViews
             InitializeComponent();
         }
 
-        private void InitVMGraphs()
-        {
-            vm.PropertyChanged +=
-                delegate (object sender, PropertyChangedEventArgs e)
-                {
-                    PropertyChangedManage(e.PropertyName);
-                };
-        }
 
-
-        private MyModel mm;
-        public MyModel VMMODEL
+        private GraphsViewModel gvm;
+        public GraphsViewModel GivenGraphsViewModel
         {
-            get { return mm; }
+            get { return gvm; }
             set
             {
-                mm = value;
                 if (Onlyonce)
                 {
-                    vm = new GraphsViewModel(mm);
+                    this.gvm = value;
                     LoadMyModelSequence();
                 }
             }
@@ -57,99 +49,77 @@ namespace FlightSimADVProg2_ex1.SubViews
 
         private void LoadMyModelSequence()
         {
-            DataContext = vm;
             Onlyonce = false;
-            // Init the view Model;
-            InitVMGraphs();
+            DataContext = this.gvm;
+            this.gvm.PropertyChanged +=
+                delegate (object sender, PropertyChangedEventArgs e)
+                {
+                    PropertyChangedManage(e.PropertyName);
+                };
         }
 
-
-        private void StartSequence()
-        {
-            // Inits the 2 graphs: Chosen Parameter Graph; Most Coorelative to Chosen Parameter Graph.
-            InitMainGraphs();
-        }
-
-        // Initialize the main graphs.
-        private void InitMainGraphs()
-        {
-            DefaultArray = new double[NumOfFrames];
-            ArrayOfFrameNumbers = new double[NumOfFrames];
-            // Zero fill for default graph.
-            for (int i = 0; i < NumOfFrames; i++)
-            {
-                DefaultArray[i] = 0;
-                ArrayOfFrameNumbers[i] = i;
-            }
-            ParamAndCoorelativeGraph.plt.PlotSignal(DefaultArray, maxRenderIndex: 0, label: "Default");
-            ParamAndCoorelativeGraph.plt.PlotSignal(DefaultArray, maxRenderIndex: 0, label: "No Correaltive Found");
-            InitGraphSettings();
-        }
 
         private void PropertyChangedManage(string name)
         {
-            if (name.Equals(CORRELATIVEPROPERTYNAME))
+            if (name.Equals(GraphsViewModel.ATTRIBUTS_NAMES_PROPERTY_NAME))
+            {
+                InitDefaultGraphScreen();                                
+            }
+            if (name.Equals(GraphsViewModel.CORRELATIVE_ATTRIBUTE_VLAUES_PROPERTY_NAME))
             {
                 UpdateGraphValues();
                 return;
             }
         }
 
+
+        private void InitDefaultGraphScreen()
+        {
+            this.NumOfFrames = this.gvm.GetOfNumberRows();
+            this.DefaultArray = new double[this.NumOfFrames];
+            this.ArrayOfFrameNumbers = new double[this.NumOfFrames];
+            for (int i = 0; i < this.NumOfFrames; i++)
+            {
+                this.DefaultArray[i] = 0;
+                this.ArrayOfFrameNumbers[i] = i;
+            }
+ 
+            ParamAndCorrelativeGraph.plt.PlotSignal(DefaultArray,
+                minRenderIndex:DEFAULT_MIN_RENDER, maxRenderIndex:DEFAULT_MAX_RENDER, label: DEFAULT_DIDNT_CHOOSE);
+            ParamAndCorrelativeGraph.plt.PlotSignal(DefaultArray,
+                minRenderIndex:DEFAULT_MIN_RENDER, maxRenderIndex: DEFAULT_MAX_RENDER, label: DEFAULT_DIDNT_CHOOSE);
+
+            ParamAndCorrelativeGraph.plt.Legend();
+            ParamAndCorrelativeGraph.plt.Style(ScottPlot.Style.Blue3);
+            ParamAndCorrelativeGraph.plt.AxisAuto();
+        }
+
+
         private void UpdateGraphValues()
         {
-            ParamAndCoorelativeGraph.plt.Clear();
-
-            /*int MinRender = 0;
-            if (vm.VM_IndexFrame > 30)
-            {
-                MinRender = vm.VM_IndexFrame - 30;
-            }
-            if (vm.VM_ChosenVal == null)
-            {
-                ParamAndCoorelativeGraph.plt.PlotSignal(DefaultArray, minRenderIndex: MinRender,
-                maxRenderIndex: vm.VM_IndexFrame, label: vm.VM_Chosen);
-            } else
-            {
-                ParamAndCoorelativeGraph.plt.PlotSignal(vm.VM_ChosenVal, minRenderIndex: MinRender,
-                maxRenderIndex: vm.VM_IndexFrame, label: vm.VM_Chosen);
-            }
-            if (vm.VM_CorVal == null)
-            {
-                ParamAndCoorelativeGraph.plt.PlotSignal(DefaultArray, minRenderIndex: MinRender,
-                    maxRenderIndex: vm.VM_IndexFrame, label: vm.VM_Cor);
-            } else
-            {
-                ParamAndCoorelativeGraph.plt.PlotSignal(vm.VM_CorVal, minRenderIndex: MinRender,
-                maxRenderIndex: vm.VM_IndexFrame, label: vm.VM_Cor);
-            }*/
+            ParamAndCorrelativeGraph.plt.Clear();
             int MinRender = 0;
-            if (vm.VM_IndexFrame > 30)
+            if (this.gvm.VM_IndexFrame > 30)
             {
-                MinRender = vm.VM_IndexFrame - 30;
+                MinRender = this.gvm.VM_IndexFrame - 30;
             }
-            ParamAndCoorelativeGraph.plt.PlotSignal(vm.VM_ChosenAttributeValues, minRenderIndex: MinRender,
-                maxRenderIndex: vm.VM_IndexFrame, label: vm.VM_ChosenAttributeName);
-            ParamAndCoorelativeGraph.plt.PlotSignal(vm.VM_CorrelativeAttributeValues, minRenderIndex: MinRender,
-                maxRenderIndex: vm.VM_IndexFrame, label: vm.VM_CorrelativeAttributeName);
+            ParamAndCorrelativeGraph.plt.PlotSignal(this.gvm.VM_ChosenAttributeValues, minRenderIndex: MinRender,
+                maxRenderIndex: this.gvm.VM_IndexFrame, label: this.gvm.VM_ChosenAttributeName);
+            ParamAndCorrelativeGraph.plt.PlotSignal(this.gvm.VM_CorrelativeAttributeValues, minRenderIndex: MinRender,
+                maxRenderIndex: this.gvm.VM_IndexFrame, label: this.gvm.VM_CorrelativeAttributeName);
             try {
-                ParamAndCoorelativeGraph.Render();
+                ParamAndCorrelativeGraph.Render();
             } catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
         }
 
-        private void InitGraphSettings()
-        {
-            ParamAndCoorelativeGraph.plt.Legend();
-            ParamAndCoorelativeGraph.plt.Style(ScottPlot.Style.Blue3);
-            ParamAndCoorelativeGraph.plt.AxisAuto();
-        }
 
         private void FlightParameterList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string muchwow = (sender as ListBox).SelectedItem.ToString();
-            vm.VM_ChosenAttributeName = muchwow;
+            this.gvm.VM_ChosenAttributeName = muchwow;
         }
 
         private void ParamAndCoorelativeGraph_Loaded(object sender, RoutedEventArgs e)

@@ -23,8 +23,6 @@ namespace FlightSimADVProg2_ex1.SubViews
     public partial class GroundRelativeView : UserControl
     {
 
-        VM_Mission5 vm5;
-        VM_Start vmstart;
         private bool onlyonce = true;
 
         public GroundRelativeView()
@@ -33,20 +31,24 @@ namespace FlightSimADVProg2_ex1.SubViews
         }
 
 
-        private MyModel mm;
-        public MyModel VMMODEL
+        private VM_Mission5 grvm;
+        public VM_Mission5 GivenGroundRelativeViewModel
         {
-            get { return mm; }
+            get { return grvm; }
             set 
             {
-                mm = value;
+                grvm = value;
                 if (onlyonce)
                 {
-                    vm5 = new VM_Mission5(mm);
-                    DataContext = vm5;
                     onlyonce = false;
+                    InitSequence();
                 }
             }
+        }
+
+        private void InitSequence()
+        {
+            DataContext = grvm;
         }
 
 

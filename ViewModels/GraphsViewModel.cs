@@ -10,7 +10,7 @@ using FlightSimADVProg2_ex1.Model;
 
 namespace FlightSimADVProg2_ex1.ViewModels
 {
-    class GraphsViewModel : INotifyPropertyChanged, IViewModel
+    public class GraphsViewModel : INotifyPropertyChanged, IViewModel
     {
         public const string DEFAULT_CORRELATIVE_NAME = "No Correlated Feature";
         public const string NO_CORRELATIVE = "-1";
@@ -19,6 +19,8 @@ namespace FlightSimADVProg2_ex1.ViewModels
         public const string CORRELATIVE_ATTRIBUTE_PROPERTY_NAME = "VM_CorrelativeAttributeName";
         public const string CHOSEN_ATTRIBUTE_VLAUES_PROPERTY_NAME = "VM_ChoseAttributeValues";
         public const string CORRELATIVE_ATTRIBUTE_VLAUES_PROPERTY_NAME = "VM_CorrelativeAttributeValues";
+        public const string START_GRAPHICS_PROPERTY_NAME = "VM_StartGraphics";
+        public const string ATTRIBUTS_NAMES_PROPERTY_NAME = "VM_AttributesNames";
 
         // Chosen feature
         private string chosen;
@@ -42,6 +44,7 @@ namespace FlightSimADVProg2_ex1.ViewModels
                 NotifyPropertyChanged("VM_" + e.PropertyName);
             };
             NumOfFrames = 0; // We didn't Initialize yet! (bcs we dont have the info for that yet.)
+            StartGraphics = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -97,6 +100,8 @@ namespace FlightSimADVProg2_ex1.ViewModels
                 NotifyPropertyChanged(CORRELATIVE_ATTRIBUTE_PROPERTY_NAME);
             }
         }
+
+
         public double[] VM_ChosenAttributeValues
         {
             get { return chosenVal; }
@@ -107,6 +112,7 @@ namespace FlightSimADVProg2_ex1.ViewModels
             }
 
         }
+
 
         public double[] VM_CorrelativeAttributeValues
         {
@@ -119,15 +125,8 @@ namespace FlightSimADVProg2_ex1.ViewModels
         }
 
 
-        //returns list of attributes
-        public List<string> VM_AttributesNames
-        {
-            get { return this.ListAttributesNames; }
-        }
-
-
         //returns colomn of attribute
-        public double[] GetValuesOfAttribute(string attribute)
+        private double[] GetValuesOfAttribute(string attribute)
         {
             List<float> list = model.GetValuesSpecificAttribute(attribute);
             return FromListToArray(list);
@@ -179,14 +178,44 @@ namespace FlightSimADVProg2_ex1.ViewModels
             return FromListToArray(list);
         }
 
+
+        private bool StartGraphics;
+        public bool VM_StartGraphics
+        {
+            get { return StartGraphics; }
+            set 
+            { 
+                this.StartGraphics = value;
+                NotifyPropertyChanged(START_GRAPHICS_PROPERTY_NAME);
+            }
+        }
+
+
+        // returns list of attributes
+        public List<string> VM_AttributesNames
+        {
+            get { return this.ListAttributesNames; }
+        }
+
+        private void InitListAttributesNames()
+        {
+            this.ListAttributesNames = model.GetListOfAttribute();
+            if (this.ListAttributesNames != null)
+            {
+                NotifyPropertyChanged(ATTRIBUTS_NAMES_PROPERTY_NAME);
+            }
+        }
+
+
         public void Initialize()
         {
             InitNumOfFrames();
+            InitListAttributesNames();
         }
 
         public void Start()
         {
-            throw new NotImplementedException();
+            VM_StartGraphics = true;
         }
     }
 
