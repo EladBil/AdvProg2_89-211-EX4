@@ -36,7 +36,8 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         /// <param name="speed"></param>
         void SetRefreshRate(float speed);
-
+        int Connect(string ip, int port);
+        void Disconnect();
         /// <summary>
         /// Given a feature returns all its values in order
         /// </summary>
