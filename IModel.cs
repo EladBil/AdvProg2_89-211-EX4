@@ -50,7 +50,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// <param name="value2"></param>
         /// <returns>line reg</returns>
         Line lineReg(string value1, string value2);
-
+        List<float> GetListOfspeeds();
 
         /// <summary>
         /// given an attribute it gives you the current info on the row

@@ -71,8 +71,7 @@ namespace FlightSimADVProg2_ex1.Model
             get { return this.ip; }
             set
             {
-                this.ip = new string(value);
-          
+                this.ip = new string(value);          
             }
         }
         /// <summary>
@@ -352,7 +351,12 @@ namespace FlightSimADVProg2_ex1.Model
             ad.DestroyAnomaly();
             return l;
         }
-      
+        public List<float> GetListOfspeeds()
+        {
+
+            return new List<float>(this.speedToMillisecondAndRate.Keys);
+         
+        }
 
 
     }
