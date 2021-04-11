@@ -33,6 +33,7 @@ namespace FlightSimADVProg2_ex1
             VMStart.VM_CSVFileName = "reg_flight.csv";
             GraphsView.GivenGraphsViewModel = this.VMStart.VM_Graphs;
             GroundRelativeView.GivenGroundRelativeViewModel = this.VMStart.VM_GroundRelativeView;
+            JoystickView.GivenJoystickVM = this.VMStart.VMJoystickProperty;
             VMStart.Initialize();
             VMStart.Start();
         }

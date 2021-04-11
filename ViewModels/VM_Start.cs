@@ -10,6 +10,15 @@ using FlightSimADVProg2_ex1.Model;
 namespace FlightSimADVProg2_ex1.ViewModels
 {
 
+    /* What dows this View Model do you ask? */
+    /* 
+     * This view model will be resposible of the initialziation of all the view models and Views!
+     * 
+     * 
+     * 
+     * 
+     ****/
+
     class VM_Start : INotifyPropertyChanged, IViewModel
     {
         private IModel model;
@@ -26,6 +35,7 @@ namespace FlightSimADVProg2_ex1.ViewModels
 
             this.VMGroundRelativeView = new VM_Mission5(this.model);
             this.VMGraphs = new GraphsViewModel(this.model);
+            this.VMJoystick = new VM_Joystick(this.model);
         }
         
         public event PropertyChangedEventHandler PropertyChanged;
@@ -50,6 +60,13 @@ namespace FlightSimADVProg2_ex1.ViewModels
         public GraphsViewModel VM_Graphs
         {
             get { return this.VMGraphs; }
+        }
+
+
+        private VM_Joystick VMJoystick;
+        public VM_Joystick VMJoystickProperty
+        {
+            get { return this.VMJoystick; }
         }
 
 

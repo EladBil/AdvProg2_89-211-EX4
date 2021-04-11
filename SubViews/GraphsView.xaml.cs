@@ -24,11 +24,13 @@ namespace FlightSimADVProg2_ex1.SubViews
         double[] ArrayOfFrameNumbers;
         double[] DefaultArray;
         bool Onlyonce = true;
+        bool InitializedChosenParam;
 
 
         public GraphsView()
         {
             InitializeComponent();
+            this.InitializedChosenParam = false;
         }
 
 
@@ -59,16 +61,26 @@ namespace FlightSimADVProg2_ex1.SubViews
         }
 
 
+
         private void PropertyChangedManage(string name)
         {
             if (name.Equals(GraphsViewModel.ATTRIBUTS_NAMES_PROPERTY_NAME))
             {
-                InitDefaultGraphScreen();                                
+                InitDefaultGraphScreen();
+                return;
             }
             if (name.Equals(GraphsViewModel.CORRELATIVE_ATTRIBUTE_VLAUES_PROPERTY_NAME))
             {
                 UpdateGraphValues();
+                this.InitializedChosenParam = true;
                 return;
+            }
+            if (name.Equals(GraphsViewModel.FRAME_INDEX_PROPERTY_NAME))
+            {
+                if (this.InitializedChosenParam && gvm.VM_IndexFrame % 5 == 0)
+                {
+                    UpdateGraphValues();
+                }
             }
         }
 
@@ -107,12 +119,11 @@ namespace FlightSimADVProg2_ex1.SubViews
                 maxRenderIndex: this.gvm.VM_IndexFrame, label: this.gvm.VM_ChosenAttributeName);
             ParamAndCorrelativeGraph.plt.PlotSignal(this.gvm.VM_CorrelativeAttributeValues, minRenderIndex: MinRender,
                 maxRenderIndex: this.gvm.VM_IndexFrame, label: this.gvm.VM_CorrelativeAttributeName);
-            try {
-                ParamAndCorrelativeGraph.Render();
-            } catch (Exception e)
+            
+            this.Dispatcher.Invoke((Action)(() =>
             {
-                Console.WriteLine(e.Message);
-            }
+                ParamAndCorrelativeGraph.Render();
+            }));
         }
 
 

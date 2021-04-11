@@ -7,9 +7,9 @@ using System.Text;
 using System.ComponentModel;
 using FlightSimADVProg2_ex1.Model;
 
-namespace FlightSimADVProg2_ex1.SubViews
+namespace FlightSimADVProg2_ex1.ViewModels
 {
-    class VM_Joystick : INotifyPropertyChanged
+    public class VM_Joystick : INotifyPropertyChanged, IViewModel
     {
         private IModel model;
         public VM_Joystick(IModel model)
@@ -29,6 +29,17 @@ namespace FlightSimADVProg2_ex1.SubViews
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
             }
         }
+
+        public void Initialize()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Start()
+        {
+            throw new NotImplementedException();
+        }
+
         //returns the throttle_1
         public double VM_Throttle1
         {

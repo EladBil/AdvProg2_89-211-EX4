@@ -14,7 +14,7 @@ namespace FlightSimADVProg2_ex1.ViewModels
     {
         public const string DEFAULT_CORRELATIVE_NAME = "No Correlated Feature";
         public const string NO_CORRELATIVE = "-1";
-        public const string FRAME_INDEX_PROPERTY_NAME = "VM_IndexFrame";
+        public const string FRAME_INDEX_PROPERTY_NAME = "VM_indexFrame";
         public const string CHOSEN_ATTRIBUTE_PROPERTY_NAME = "VM_ChosenAttributeName";
         public const string CORRELATIVE_ATTRIBUTE_PROPERTY_NAME = "VM_CorrelativeAttributeName";
         public const string CHOSEN_ATTRIBUTE_VLAUES_PROPERTY_NAME = "VM_ChoseAttributeValues";
@@ -55,16 +55,21 @@ namespace FlightSimADVProg2_ex1.ViewModels
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
             }
         }
-        //returns the frame we are currently looking at
+
+
+        private int IndexFrame;
         public int VM_IndexFrame
         {
-            get { return model.IndexFrame; }
+            get { return this.IndexFrame = model.IndexFrame; }
             set
             {
+                this.IndexFrame = value;
                 model.IndexFrame = value;
                 NotifyPropertyChanged(FRAME_INDEX_PROPERTY_NAME);
             }
         }
+
+
         public string VM_ChosenAttributeName
         {
             get { return this.chosen; }

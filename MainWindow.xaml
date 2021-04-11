@@ -5,14 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FlightSimADVProg2_ex1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="720" Width="1024"
         xmlns:controls="clr-namespace:FlightSimADVProg2_ex1.SubViews">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="7*"/>
         </Grid.ColumnDefinitions>
-        <controls:GraphsView Loaded="GraphsView_Loaded" x:Name="GraphsView"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="6*"/>
+        </Grid.RowDefinitions>
+        <controls:Joystick x:Name="JoystickView" Grid.Column="0" Grid.Row="1"/>
         <controls:GroundRelativeView x:Name="GroundRelativeView" Grid.Column="1" Loaded="GroundRelativeView_Loaded"/>
+        <controls:GraphsView Loaded="GraphsView_Loaded" x:Name="GraphsView" Grid.Row="1" Grid.Column="1"/>
+
     </Grid>
 </Window>
