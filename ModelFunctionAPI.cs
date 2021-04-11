@@ -63,7 +63,18 @@ namespace FlightSimADVProg2_ex1.Model
         /// <summary>
         /// Holds the IP of the flight gear
         /// </summary>
-        private string ip = "";
+        private string ip = "127.0.0.1";
+       
+
+        public string IP
+        {
+            get { return this.ip; }
+            set
+            {
+                this.ip = new string(value);
+          
+            }
+        }
         /// <summary>
         /// Holds the port of the flight gear
         /// </summary>

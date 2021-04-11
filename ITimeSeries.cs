@@ -53,8 +53,7 @@ namespace FlightSimADVProg2_ex1.Model
         public static extern int TsGetAttributesSize(IntPtr ts);
         [DllImport(myDll)]
         public static extern void TsDeleteRow(IntPtr row);
-        [DllImport(myDll)]
-        public static extern int testing();
+       
         /// <summary>
         /// Holds the pointer to the timeseries object in c ++
         /// </summary>

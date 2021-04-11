@@ -60,13 +60,13 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         /// <param name="ip"></param>
         /// <param name="port"></param>
-        public void Connect(string ip, int port)
+        public int Connect(string ip, int port)
         {
             this.ip = ip;
             this.port = port;
       
             this.telnetClientFlightGear.Connect(this.ip, this.port);
-        
+            return 0;
 
         }
         /// <summary>
