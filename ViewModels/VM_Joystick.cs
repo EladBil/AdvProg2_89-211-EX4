@@ -44,22 +44,27 @@ namespace FlightSimADVProg2_ex1.ViewModels
         public double VM_Throttle1
         {
             get { return model.Throttle_1; }
+            set { }
         }
         public double VM_Throttle2
         {
             get { return model.Throttle_2; }
+            set { }
         }
         public double VM_Rudder
         {
             get { return model.Rudder; }
+            set { }
         }
         public double VM_Aileron
         {
             get { return model.Aileron; }
+            set { }
         }
         public double VM_Elevator
         {
             get { return model.Elevator; }
+            set { }
         }
     }
 }

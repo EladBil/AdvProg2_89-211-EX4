@@ -106,10 +106,24 @@ namespace FlightSimADVProg2_ex1.ViewModels
             VMGraphs.Initialize();
             VM_GroundRelativeView.Initialize();
         }
-
+        //conects to the flight gear
+        public void ConnectFG(string ip, int port)
+        {
+            this.model.Connect(ip, port);
+        }
+        //disconects from the flight gear
+        public void DisconnectFG()
+        {
+            this.model.Disconnect();
+        }
+        //Plays the flight gear
         public void Start()
         {
             this.model.start();
+        }
+        public void Pause()
+        {
+            this.model.pause();
         }
     }
 }
