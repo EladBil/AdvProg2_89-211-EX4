@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Net.Sockets;
 using System.Diagnostics;
 
-namespace model
+namespace FlightSimADVProg2_ex1.Model
 {
     /// <summary>
     /// Part of the basic class model
