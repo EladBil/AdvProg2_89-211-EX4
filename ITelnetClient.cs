@@ -5,7 +5,7 @@ using System.Text;
 
 using System.Net;
 
-namespace model
+namespace FlightSimADVProg2_ex1.Model
 {
     interface ITelnetClient
     {
