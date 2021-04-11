@@ -6,7 +6,7 @@ using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace model
+namespace FlightSimADVProg2_ex1.Model
 {
     class Scattering
     {
