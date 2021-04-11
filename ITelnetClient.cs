@@ -21,8 +21,8 @@ namespace model
     {
         byte[] bytes = new byte[4098];
         Socket sender;
-        
-        public int Connect(string ip, int port) 
+
+        public int Connect(string ip, int port)
         {
             // Connect to a Remote server  
             // Get Host IP Address that is used to establish a connection  
@@ -31,7 +31,7 @@ namespace model
             try
             {
 
-              
+
 
                 IPHostEntry host = Dns.GetHostEntry(ip);
                 IPAddress ipAddress = host.AddressList[0];
@@ -40,7 +40,7 @@ namespace model
                 // Create a TCP/IP  socket.    
                 this.sender = new Socket(ipAddress.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
-               
+
                 try
                 {
                     this.sender.Connect(remoteEP);
@@ -71,7 +71,7 @@ namespace model
 
 
         }
-        public void Write(string command) 
+        public void Write(string command)
         {
             //   Console.WriteLine("Socket connected to {0}", this.sender.RemoteEndPoint.ToString());
 
@@ -81,9 +81,9 @@ namespace model
                 byte[] msg = Encoding.ASCII.GetBytes(command);
 
                 // Send the data through the socket.    
-               int bytesSent = this.sender.Send(msg);
-               
-               
+                int bytesSent = this.sender.Send(msg);
+
+
             }
             catch (ArgumentNullException ane)
             {
@@ -98,7 +98,7 @@ namespace model
                 Console.WriteLine("Unexpected exception : {0}", e.ToString());
             }
         }
-        public string Read() 
+        public string Read()
         {
             try
             {
@@ -122,7 +122,8 @@ namespace model
             }
             return "-1";
         }
-        public void Disconnect() {
+        public void Disconnect()
+        {
             try
             {
                 this.sender.Shutdown(SocketShutdown.Both);
@@ -150,18 +151,18 @@ namespace model
 
     class MyTelnetFlightGearClientUDP : ITelnetClient
     {
-       
-       
-       
+
+
+
         private int port;
         UdpClient receiver;
 
         public int Connect(string ip, int port)
         {
-          
+
             this.port = port;
-           
-            this.receiver  = new UdpClient();
+
+            this.receiver = new UdpClient();
             // this.receiver.Connect(IPAddress.Parse(ip) , this.port);
             this.receiver.Connect(ip, this.port);
             return 0;
@@ -196,7 +197,7 @@ namespace model
         }
         public void Disconnect()
         {
-           
+
             this.receiver.Client.Shutdown(SocketShutdown.Receive);
             this.receiver.Client.Close();
         }

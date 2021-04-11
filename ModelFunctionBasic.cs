@@ -6,19 +6,17 @@ using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Runtime.InteropServices;
-
+using System.Net.Sockets;
+using System.Diagnostics;
 
 namespace model
 {
     /// <summary>
-    /// Interface for the model
+    /// Part of the basic class model
+    ///Contains the basic methods, getters and setters
     /// </summary>
-   
 
-
-
-
-    partial class Model : IModel
+    partial class MyModel : IModel
     {
 
 
@@ -29,7 +27,7 @@ namespace model
 
         public Boolean Stop
         {
-           
+
             set
             {
                 this.stop = value;
@@ -42,20 +40,19 @@ namespace model
         /// constractor - Initializes the dictionary of speed
         /// </summary>
         /// <param name="telnetClient"></param>
-        public Model(ITelnetClient telnetClient)
+        public MyModel(ITelnetClient telnetClient)
         {
             this.telnetClientFlightGear = telnetClient;
             stop = false;
-
-            this.speedToMilliseconds = new Dictionary<float, int>();
-            speedToMilliseconds.Add(0, 500);
-            speedToMilliseconds.Add((float)0.25,300 );
-            speedToMilliseconds.Add((float)0.5, 200);
-            speedToMilliseconds.Add(1, 100);
-            speedToMilliseconds.Add((float)1.25, 85);
-            speedToMilliseconds.Add((float)1.5, 75);
-            speedToMilliseconds.Add((float)1.75, 50);
-            speedToMilliseconds.Add(2, 20);
+            
+            this.speedToMillisecondAndRate = new Dictionary<float, MiliSecondAndRate>();
+            speedToMillisecondAndRate.Add(0, new MiliSecondAndRate(500 , 2));
+            speedToMillisecondAndRate.Add((float)0.25, new MiliSecondAndRate(250, 4));
+            speedToMillisecondAndRate.Add((float)0.5, new MiliSecondAndRate(200, 5));
+            speedToMillisecondAndRate.Add(1, new MiliSecondAndRate(100, 10));
+            speedToMillisecondAndRate.Add((float)1.5, new MiliSecondAndRate(50, 20));
+            speedToMillisecondAndRate.Add((float)1.75, new MiliSecondAndRate(40, 25));
+            speedToMillisecondAndRate.Add(2, new MiliSecondAndRate(20, 50));
 
         }
         /// <summary>
@@ -67,7 +64,10 @@ namespace model
         {
             this.ip = ip;
             this.port = port;
+      
             this.telnetClientFlightGear.Connect(this.ip, this.port);
+        
+
         }
         /// <summary>
         /// disconnect from flight gear
@@ -81,53 +81,103 @@ namespace model
         /// Initiates a process by which it takes a line from the ts and sends
         /// it to flight gear and updates all the fields accordingly
         /// </summary>
-        public void start()
+        public void start(string ip , int port)
         {
-           
-
-
-            //need take rows from th eime series wait to shmoel
-            // IntPtr ts = CreateTs(this.fileCsv);
-
-
-
-
-            new Thread(delegate ()
+            if (this.fileCSV.Equals(""))
             {
-                
-                while (!stop)
+                Console.WriteLine("The appropriate files must be uploaded");
+                return;
+            }
+            try
+            {
+                TcpClient client = new TcpClient(ip, port);
+                //Console.WriteLine("start(ip,port)");
+
+                new Thread(delegate ()
                 {
-
-
-
-                    string line;
-
-
-                    this.arrayRowNow = ts.TsGetRow(IndexFrame);
-                   
-
-                   // convert vectorFloat from dll to arrayFloat in c#
-                    
                
+                    NetworkStream stream = client.GetStream();
+                    while (!stop)
+                    {
+                        string line;
+                  
+                        this.arrayRowNow = ts.TsGetRow(IndexFrame);
+                        // convert vectorFloat from dll to arrayFloat in c#
                         this.updateAllattributes(arrayRowNow);
                         line = String.Join(",", arrayRowNow);
-
-
-                                  telnetClientFlightGear.Write(line);
+                        line += "\r\n";
+                        Byte[] data = System.Text.Encoding.ASCII.GetBytes(line);
+                        stream.Write(data, 0, data.Length);
+                        //telnetClientFlightGear.Write(line);
+                        IndexFrame++;
                    
+                        Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
+                        if (IndexFrame >= this.countRows)
+                        {
+                            stop = true;
+
+                        }
+                    }
+            
+
+                  client.Close();
+                }).Start();
+
+
+            }
+            catch (SocketException)
+            {
+                this.start();
+            }
+
+
+        }
+        public void start()
+        {
+          
+            if (this.fileCSV.Equals(""))
+            {
+                Console.WriteLine("The appropriate files must be uploaded");
+                return;
+            }
+            //Console.WriteLine("start()");
+            new Thread(delegate ()
+            {
+                stop = false;
+                if (IndexFrame >= this.countRows)
+                {
+                    stop = true;
+
+                }
+                while (!stop)
+                {
+                    
+
+                    this.arrayRowNow = ts.TsGetRow(IndexFrame);
+                    // convert vectorFloat from dll to arrayFloat in c#
+                    this.updateAllattributes(arrayRowNow);
+                    string line;
+                    line = String.Join(",", arrayRowNow);
+                    line += "\r\n";
+                    //Console.WriteLine(line);
+
                     IndexFrame++;
-                    Console.WriteLine(IndexFrame);
-
-                    Thread.Sleep(millisecondsTimeout);// read the data in 4Hz
-
-
+                 
+                    Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
+                   
+                    if (IndexFrame >= this.countRows)
+                    {
+                        stop = true;
+                        
+                    }
 
                 }
                 //telnetClientFlightGear.Disconnect();
 
-
+               
             }).Start();
-           
+
+
         }
 
         /// <summary>
@@ -157,7 +207,7 @@ namespace model
             RollDeg = arrayValue[this.DictValuesToNumInCsv["roll-deg"]];
             PitchDeg = arrayValue[this.DictValuesToNumInCsv["pitch-deg"]];
             HeadingDeg = arrayValue[this.DictValuesToNumInCsv["heading-deg"]];
-            
+
             SideSlipDeg = arrayValue[this.DictValuesToNumInCsv["side-slip-deg"]];
             AirspeedKt = arrayValue[this.DictValuesToNumInCsv["airspeed-kt"]];
             Glideslope = arrayValue[this.DictValuesToNumInCsv["glideslope"]];
@@ -168,7 +218,7 @@ namespace model
             AttitudeIndicatorIndicatedPitchDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_indicated-pitch-deg"]];
             AttitudeIndicatorIndicatedRollDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_indicated-roll-deg"]];
             AttitudeIndicatorInternalPitchDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_internal-pitch-deg"]];
-            
+
             AttitudeIndicatorInternalRollDeg = arrayValue[this.DictValuesToNumInCsv["attitude-indicator_internal-roll-deg"]];
             EncoderIndicatedAltitudeFt = arrayValue[this.DictValuesToNumInCsv["encoder_indicated-altitude-ft"]];
             EncoderPressureAltFt = arrayValue[this.DictValuesToNumInCsv["encoder_pressure-alt-ft"]];
@@ -179,7 +229,7 @@ namespace model
             MagneticCompassIndicatedHeadingDeg = arrayValue[this.DictValuesToNumInCsv["magnetic-compass_indicated-heading-deg"]];
             SlipSkidBallIndicatedSlipSkid = arrayValue[this.DictValuesToNumInCsv["slip-skid-ball_indicated-slip-skid"]];
             TurnIndicatorIndicatedTurnRate = arrayValue[this.DictValuesToNumInCsv["turn-indicator_indicated-turn-rate"]];
-           
+
             VerticalSpeedIndicatorIndicatedSpeedFpm = arrayValue[this.DictValuesToNumInCsv["vertical-speed-indicator_indicated-speed-fpm"]];
             EngineRpm = arrayValue[this.DictValuesToNumInCsv["engine_rpm"]];
 
@@ -196,7 +246,7 @@ namespace model
                 millisecondsTimeout = value;
             }
         }
-        
+
 
 
 
@@ -660,7 +710,10 @@ namespace model
                 NotifyPropertyChanged("engineRpm");
             }
         }
-
+        /// <summary>
+        /// Report to anyone registered that the value has changed
+        /// </summary>
+        /// <param name="propName">Name of value changed</param>
 
         private void NotifyPropertyChanged(string propName)
         {
@@ -675,5 +728,5 @@ namespace model
 
 
 
-        
+
 }

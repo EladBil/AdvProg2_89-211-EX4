@@ -4,28 +4,28 @@ using System.Text;
 
 namespace model
 {
-  /*  class Point
-    {
-        float x;
-        public float X
-        {
-            get { return x; }
-            set
-            {
-                x = value;
-               
-            }
-        }
-        float y;
-        public float Y
-        {
-            get { return y; }
-            set
-            {
-                y = value;
-            }
-        }
-    }*/
+    /*  class Point
+      {
+          float x;
+          public float X
+          {
+              get { return x; }
+              set
+              {
+                  x = value;
+
+              }
+          }
+          float y;
+          public float Y
+          {
+              get { return y; }
+              set
+              {
+                  y = value;
+              }
+          }
+      }*/
 
 
 
@@ -71,11 +71,8 @@ namespace model
             return a * x + b;
         }
     }
-            
-
-        
-       
-    }
 
 
 
+
+}

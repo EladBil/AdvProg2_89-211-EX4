@@ -66,20 +66,16 @@ namespace model
         /// <returns></returns>
         List<string> GetListOfAttribute();
 
-        /// <summary>
-        /// returns list of anomalies based off of reg (SAD) 
-        /// </summary>
-        /// <param name="learnNormalCsv"></param>
-        /// <returns></returns>
-        List<int> AnomalyReg(string learnNormalCsv);
+
         /// <summary>
         /// returns list of anomalies based off of circle (HAD)
         /// </summary>
         /// <param name="learnNormalCsv"></param>
         /// <returns></returns>
-        List<int> AnomalyCirc(string learnNormalCsv);
+        List<int> AnomalyAd(string learnNormalCsv);
 
-
+        public void start();
+        public void start(string ip, int port);
 
         /*
          * get most cor receives a field (thats on a csv) and returns which one of the other fields are the most corralitive from the 

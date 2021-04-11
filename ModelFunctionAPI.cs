@@ -12,10 +12,23 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace model
 {
-    partial class Model : IModel
+    class MiliSecondAndRate
+    {
+        public MiliSecondAndRate(int MiliSeconds, int Rate)
+        {
+            this.MiliSeconds = MiliSeconds;
+            this.Rate = Rate;
+        }
+        public int MiliSeconds { get; set; }
+        public int Rate { get; set; }
+
+       
+    }
+    partial class MyModel : IModel
     {
 
 
@@ -28,7 +41,7 @@ namespace model
         /// The delay time between pulling lines of the ts
         /// </summary>
         private int millisecondsTimeout = 100;
-     
+
         /// <summary>
         /// The same file is sent to timeseries plus a row of attribute names
         ///In order not to change the current file
@@ -42,7 +55,7 @@ namespace model
         /// Will hold the api file name
         /// </summary>
         private string fileAPI = "";
-      
+        private string fileCSV = "";
         /// <summary>
         /// Holds the number of rows (without the attribute names) of the csv file
         /// </summary>
@@ -64,9 +77,9 @@ namespace model
         /// The dictionary "speedToMilliseconds" links the number of speeds to the number of milliseconds 
         /// that the thread will rest between each pull of a row from timeseries
         /// </summary>
-        private Dictionary<float, int> speedToMilliseconds;
+        private Dictionary<float, MiliSecondAndRate> speedToMillisecondAndRate;
 
-        
+
         /// <summary>
         /// "DictValuesToNumInCsv" - map between the values and their column number in the csv file
         /// </summary>
@@ -78,7 +91,7 @@ namespace model
         /// </summary>
         private TimeSeriesModel ts;
 
-       
+
 
 
 
@@ -88,12 +101,21 @@ namespace model
         ///
         public int LoadingAPI(string pathFileAPI)
         {
-            this.fileAPI = pathFileAPI;
-            this.firstLine = Scattering.CreatestringOfValues(pathFileAPI);
-            this.DictValuesToNumInCsv = new Dictionary<string, int>();
+            try
+            {
+                this.fileAPI = pathFileAPI;
+                this.firstLine = Scattering.CreatestringOfValues(pathFileAPI);
+                this.DictValuesToNumInCsv = new Dictionary<string, int>();
 
-            this.firstLine = Scattering.CreateDictionaryFromStringCSV(this.DictValuesToNumInCsv, this.firstLine);
-          
+                this.firstLine = Scattering.CreateDictionaryFromStringCSV(this.DictValuesToNumInCsv, this.firstLine);
+            }
+            catch
+            {
+                Console.WriteLine("Failed to load API file");
+                this.fileAPI = "";
+                return -1;
+            }
+
             return 0;
         }
         /// <summary>
@@ -106,17 +128,31 @@ namespace model
         /// </returns>
         public int LoadingCSV(string PathFileCSV)
         {
+            if (this.fileAPI.Equals(""))
+            {
+                Console.WriteLine("An API file must be uploaded");
+                return -1;
+            }
+            try
+            {
+                this.fileCSV = PathFileCSV;
+                string data = "";
+                File.WriteAllText(this.fileCsvToWork, data);
 
-             string data = "";
-            File.WriteAllText(this.fileCsvToWork, data);
-            
-            Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
-            
-            this.ts =  new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
-         
-            return 0;
+                Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
+
+                this.ts = new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
+                this.countRows = this.ts.AmountLines();
+                return 0;
+            }
+            catch
+            {
+                this.fileCSV = "";
+                Console.WriteLine("Failed to load csv file");
+                return -1;
+
+            }
         }
-        
 
         /// <summary>This method return number of rows of csv file Without the first line of attribute</summary>
         ///<returns>number of rows of csv file Without the first line of attribute</returns>
@@ -125,7 +161,7 @@ namespace model
             //return TsGetColSize(this.ts);
             return this.countRows;
         }
-       
+
         /// <summary>
         /// return the speed of send Of sending the data
         /// Speed is milliseconds and the process stops between sending
@@ -145,12 +181,12 @@ namespace model
         /// <param name="speed"></param>
         public void SetRefreshRate(float speed)
         {
-            if (this.speedToMilliseconds.ContainsKey(speed))
+            if (this.speedToMillisecondAndRate.ContainsKey(speed))
             {
                 this.speed = speed;
-                this.millisecondsTimeout = this.speedToMilliseconds[speed];
+                this.millisecondsTimeout = this.speedToMillisecondAndRate[speed].MiliSeconds;
             }
-           
+
         }
 
 
@@ -160,7 +196,7 @@ namespace model
         /// <param name="p">pointer to vector of float from dll</param>
         /// <param name="size"> the size of vector</param>
         /// <returns>list of float</returns>
-      
+
         public List<float> GetValuesSpecificAttribute(string attribute)
         {
             int numberCol = this.DictValuesToNumInCsv[attribute];
@@ -198,17 +234,18 @@ namespace model
             {
                 float tempCor = 0;
                 //Skip the feature itself
-                if (attribute2.Key.Equals(givenIndex)){
+                if (attribute2.Key.Equals(givenIndex))
+                {
                     continue;
                 }
                 tempCor = ts.pearsonFromColIndex(atrribute1, attribute2.Value);
-                if (Math.Abs(tempCor)>= Math.Abs(corMost))
+                if (Math.Abs(tempCor) >= Math.Abs(corMost))
                 {
                     nameOfMostCor = attribute2.Key;
                     corMost = tempCor;
                 }
             }
-           
+
             return nameOfMostCor;
         }
 
@@ -223,12 +260,12 @@ namespace model
         /// <returns>Line of reg</returns>
         public Line lineReg(string value1, string value2)
         {
-           
+
             int x = this.DictValuesToNumInCsv[value1];
             int y = this.DictValuesToNumInCsv[value2];
 
 
-            return ts.lineReg(x,y);
+            return ts.lineReg(x, y);
         }
         /// <summary>
         /// GetListOfAttribute -  return list of Attributes (values) 
@@ -258,61 +295,19 @@ namespace model
 
 
 
-        [DllImport("AP2Libraries.dll")]
-        public static extern float varFromColIndex(IntPtr ts, int col);
-
-        /// <summary>
-        /// Calculate the anomalies using dll functions for regression
-        /// </summary>
-        /// <param name="learnNormalCsv">A path of a file for learning the algorithm</param>
-        /// <returns>list of anomalies based off of reg (SAD)</returns>
-        public List<int> AnomalyReg(string learnNormalCsv)
-        {
-            string learnNormalCsvToWork = "learnNormalCsvToWork.csv";
-            //create ts to learnNormalCsv
-            var lineCount = 0;
-            using (var reader = File.OpenText(learnNormalCsv))
-            {
-                while (reader.ReadLine() != null)
-                {
-                    lineCount++;
-                }
-            }
-           
-
-
-
-            string data = "";
-            File.WriteAllText(learnNormalCsvToWork, data);
-
-            Scattering.AddFirstLineInCsv(learnNormalCsv, learnNormalCsvToWork, this.firstLine);
-
-
-
-            TimeSeriesModel tsNormal = new TimeSeriesModel(learnNormalCsvToWork);
-          
-            //create SimpleAnomalyDetector
-            AnomalyReg sad = new AnomalyReg();
-        
-            //The algorithm learns the normal file
-            sad.LearnNormal(tsNormal);
-            //The algorithm checks for anomalies in our file
-           
-            
-            List<int> l =  sad.Detect(this.ts);
-            sad.DestroyAnomaly();
-            return l;
-         
-        }
         /// <summary>
         /// Calculate the anomalies using dll functions for Circle
         /// </summary>
         /// <param name="learnHibridCsv">A path of a file for learning the algorithm</param>
         /// <returns>list of anomalies based off of circle (HAD)</returns>
-        public List<int> AnomalyCirc(string learnHibridCsv)
+        public List<int> AnomalyAd(string learnHibridCsv)
         {
-
-            string learnHibridCsvToWork = "learnHibridCsvToWork.csv";
+            if (this.fileCSV.Equals(""))
+            {
+                Console.WriteLine("The appropriate files must be uploaded to boot the model");
+                return new List<int>();
+            }
+            string learnHibridCsvToWork = "learnAdCsvToWork.csv";
             //create ts to learnNormalCsv
             var lineCount = 0;
             using (var reader = File.OpenText(learnHibridCsv))
@@ -322,7 +317,7 @@ namespace model
                     lineCount++;
                 }
             }
-            
+
 
 
 
@@ -332,27 +327,25 @@ namespace model
             Scattering.AddFirstLineInCsv(learnHibridCsv, learnHibridCsvToWork, this.firstLine);
 
             TimeSeriesModel tsNormal = new TimeSeriesModel(learnHibridCsvToWork);
-            
+
             //create SimpleAnomalyDetector
-            AnomalyCirc had = new AnomalyCirc();
+            AnomalyAd ad = new AnomalyAd();
 
 
-          
+
 
             //The algorithm learns the normal file
-            had.LearnNormal(tsNormal);
+            ad.LearnNormal(tsNormal);
             //The algorithm checks for anomalies in our file
-            List<int> l = had.Detect(this.ts);
-            had.DestroyAnomaly();
+            List<int> l = ad.Detect(this.ts);
+            ad.DestroyAnomaly();
             return l;
         }
-        [DllImport("AP2Libraries.dll")]
-        public static extern int TsGetAttributesSize(IntPtr ts);
-      
+
+
 
 
     }
 
 }
-
 
