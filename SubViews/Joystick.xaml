@@ -14,9 +14,26 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="17*"/>
             <RowDefinition Height="3*"/>
-        </Grid.RowDefinitions>
+        </Grid.RowDefinitions> 
+           
+        <Slider Grid.Row="0"
+            Orientation="Vertical"
+            HorizontalAlignment="Center"   
+            Value="{Binding VM_Throttle1}" 
+            ValueChanged="ThrottleSlider_ValueChanged"
+            Minimum="-1"
+            Maximum="1"
+            Background ="Yellow"
+        />
+        <Slider Grid.Row="1" Grid.Column="1"
+            VerticalAlignment="Center"
+            Value="{Binding VM_Rudder}"
+            ValueChanged="RudderSlider_ValueChanged"
+            Minimum="-1"
+            Maximum="1"
+            Background ="Turquoise"
+        />
 
-        <Slider Grid.Column="0"/>
 
         <Grid Grid.Column="1">
             <Canvas  x:Name="Base" Margin="0" Width="340" Height="340">
