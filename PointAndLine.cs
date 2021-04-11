@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace model
+namespace FlightSimADVProg2_ex1.Model
 {
     /*  class Point
       {
