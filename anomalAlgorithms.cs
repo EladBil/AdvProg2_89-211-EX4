@@ -4,7 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Linq;
 
-namespace model
+namespace FlightSimADVProg2_ex1.Model
 
 {
 
