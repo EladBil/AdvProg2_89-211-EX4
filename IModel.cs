@@ -75,7 +75,7 @@ namespace FlightSimADVProg2_ex1.Model
         List<int> AnomalyAd(string learnNormalCsv);
 
         public void start();
-        public void start(string ip, int port);
+        public void pause();
 
         /*
          * get most cor receives a field (thats on a csv) and returns which one of the other fields are the most corralitive from the 
