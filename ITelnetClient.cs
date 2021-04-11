@@ -13,14 +13,18 @@ namespace FlightSimADVProg2_ex1.Model
         void Write(string command);
         string Read(); // blocking call
         void Disconnect();
+        bool isConnected();
 
     }
 
 
     class MyTelnetFlightGearClientTCP : ITelnetClient
     {
+        TcpClient client;
+        NetworkStream stream;
         byte[] bytes = new byte[4098];
-        Socket sender;
+        
+
 
         public int Connect(string ip, int port)
         {
@@ -30,58 +34,31 @@ namespace FlightSimADVProg2_ex1.Model
             // If a host has multiple addresses, you will get a list of addresses  
             try
             {
-
-
-
-                IPHostEntry host = Dns.GetHostEntry(ip);
-                IPAddress ipAddress = host.AddressList[0];
-                IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
-
-                // Create a TCP/IP  socket.    
-                this.sender = new Socket(ipAddress.AddressFamily,
-                    SocketType.Stream, ProtocolType.Tcp);
-
-                try
-                {
-                    this.sender.Connect(remoteEP);
-                    return 0;
-                }
-                catch (ArgumentNullException ane)
-                {
-                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
-                    return -1;
-                }
-                catch (SocketException se)
-                {
-                    Console.WriteLine("SocketException : {0}", se.ToString());
-                    return -1;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
-                    return -1;
-                }
-
+                //TcpClient client = new TcpClient(ip, port);
+                this.client = new TcpClient(ip, port);
+                this.stream = this.client.GetStream();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
                 return -1;
             }
-
-
+            return 0;
         }
         public void Write(string command)
         {
-            //   Console.WriteLine("Socket connected to {0}", this.sender.RemoteEndPoint.ToString());
 
-            // Encode the data string into a byte array.
+           /* if(this.stream == null)
+            {
+                Console.WriteLine("no Connection");
+                return;
+              
+            }*/
             try
             {
-                byte[] msg = Encoding.ASCII.GetBytes(command);
-
-                // Send the data through the socket.    
-                int bytesSent = this.sender.Send(msg);
+                Byte[] data = System.Text.Encoding.ASCII.GetBytes(command);
+                this.stream.Write(data, 0, data.Length);
+               
 
 
             }
@@ -103,7 +80,7 @@ namespace FlightSimADVProg2_ex1.Model
             try
             {
                 // Receive the response from the remote device.    
-                int bytesRec = this.sender.Receive(this.bytes);
+                int bytesRec = this.stream.Read(this.bytes);
                 //  Console.WriteLine("Echoed test = {0}",   Encoding.ASCII.GetString(this.bytes, 0, bytesRec));
 
                 return Encoding.ASCII.GetString(this.bytes, 0, bytesRec);
@@ -126,8 +103,8 @@ namespace FlightSimADVProg2_ex1.Model
         {
             try
             {
-                this.sender.Shutdown(SocketShutdown.Both);
-                this.sender.Close();
+                this.client.Close();
+                this.stream.Close();
             }
             catch (ArgumentNullException ane)
             {
@@ -143,7 +120,14 @@ namespace FlightSimADVProg2_ex1.Model
             }
         }
 
-
+        public bool isConnected()
+        {
+            if (this.client == null || this.stream == null)
+            {
+                return false;
+            }
+            return true;
+        }
 
     }
 
@@ -202,7 +186,11 @@ namespace FlightSimADVProg2_ex1.Model
             this.receiver.Client.Close();
         }
 
-
+        public bool isConnected()
+        {
+           
+            return false;
+        }
 
     }
 }

@@ -341,8 +341,7 @@ namespace FlightSimADVProg2_ex1.Model
             ad.DestroyAnomaly();
             return l;
         }
-
-
+      
 
 
     }

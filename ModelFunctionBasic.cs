@@ -81,22 +81,34 @@ namespace FlightSimADVProg2_ex1.Model
         /// Initiates a process by which it takes a line from the ts and sends
         /// it to flight gear and updates all the fields accordingly
         /// </summary>
-        public void start(string ip , int port)
+        public void start()
         {
+          
+
+           // Console.WriteLine("start()");
             if (this.fileCSV.Equals(""))
             {
                 Console.WriteLine("The appropriate files must be uploaded");
                 return;
             }
+            if (!this.telnetClientFlightGear.isConnected())
+            {
+                start2();
+                return;
+            }
+            this.stop = false;
+            if (IndexFrame >= this.countRows)
+            {
+                stop = true;
+
+            }
             try
             {
-                TcpClient client = new TcpClient(ip, port);
-                //Console.WriteLine("start(ip,port)");
+               
 
                 new Thread(delegate ()
                 {
                
-                    NetworkStream stream = client.GetStream();
                     while (!stop)
                     {
                         string line;
@@ -106,9 +118,8 @@ namespace FlightSimADVProg2_ex1.Model
                         this.updateAllattributes(arrayRowNow);
                         line = String.Join(",", arrayRowNow);
                         line += "\r\n";
-                        Byte[] data = System.Text.Encoding.ASCII.GetBytes(line);
-                        stream.Write(data, 0, data.Length);
-                        //telnetClientFlightGear.Write(line);
+                       
+                        this.telnetClientFlightGear.Write(line);
                         IndexFrame++;
                    
                         Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
@@ -120,27 +131,27 @@ namespace FlightSimADVProg2_ex1.Model
                     }
             
 
-                  client.Close();
+                 
                 }).Start();
 
 
             }
             catch (SocketException)
             {
-                this.start();
+                this.start2();
             }
 
 
         }
-        public void start()
+        public void start2()
         {
-          
+            Console.WriteLine("start2()");
             if (this.fileCSV.Equals(""))
             {
                 Console.WriteLine("The appropriate files must be uploaded");
                 return;
             }
-            //Console.WriteLine("start()");
+            Console.WriteLine("start2()");
             new Thread(delegate ()
             {
                 stop = false;
@@ -159,7 +170,8 @@ namespace FlightSimADVProg2_ex1.Model
                     string line;
                     line = String.Join(",", arrayRowNow);
                     line += "\r\n";
-                    //Console.WriteLine(line);
+
+               
 
                     IndexFrame++;
                  
@@ -179,7 +191,10 @@ namespace FlightSimADVProg2_ex1.Model
 
 
         }
-
+        public void pause()
+        {
+            this.Stop = true;
+        }
         /// <summary>
         /// Update the fields
         /// </summary>
