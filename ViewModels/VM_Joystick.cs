@@ -35,7 +35,7 @@ namespace FlightSimADVProg2_ex1.ViewModels
             throw new NotImplementedException();
         }
 
-        public void Start()
+        public void StartAnimation()
         {
             throw new NotImplementedException();
         }
@@ -49,7 +49,6 @@ namespace FlightSimADVProg2_ex1.ViewModels
         public double VM_Throttle2
         {
             get { return model.Throttle_2; }
-            set { }
         }
         public double VM_Rudder
         {
@@ -59,12 +58,10 @@ namespace FlightSimADVProg2_ex1.ViewModels
         public double VM_Aileron
         {
             get { return model.Aileron; }
-            set { }
         }
         public double VM_Elevator
         {
             get { return model.Elevator; }
-            set { }
         }
     }
 }

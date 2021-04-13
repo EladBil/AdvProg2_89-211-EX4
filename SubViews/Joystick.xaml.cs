@@ -87,7 +87,6 @@ namespace FlightSimADVProg2_ex1.SubViews
                 }
                 ELEVATOR_POSPONER++;
             }
-            
         }
 
         
@@ -107,14 +106,7 @@ namespace FlightSimADVProg2_ex1.SubViews
                 knobPosition.Y = jsvm.VM_Elevator * 32;
             }));
         }
-        private void ThrottleSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
 
-        }
-        private void RudderSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-
-        }
         private void centerKnob_Completed(object sender, EventArgs e)
         {
             

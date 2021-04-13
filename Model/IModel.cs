@@ -13,13 +13,13 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         /// <param name="fileAPI">path</param>
         /// <returns></returns>
-        public int LoadingAPI(string fileAPI);
+        int LoadingAPI(string fileAPI);
         /// <summary>
         /// upload file csv
         /// </summary>
         /// <param name="fileAPI">path</param>
         /// <returns></returns>
-        public int LoadingCSV(string fileAPI);
+        int LoadingCSV(string fileAPI);
 
         /// <summary>
         /// Get Number Rows 
@@ -50,7 +50,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// <param name="value2"></param>
         /// <returns>line reg</returns>
         Line lineReg(string value1, string value2);
-
+        List<float> GetListOfspeeds();
 
         /// <summary>
         /// given an attribute it gives you the current info on the row
@@ -74,8 +74,10 @@ namespace FlightSimADVProg2_ex1.Model
         /// <returns></returns>
         List<int> AnomalyAd(string learnNormalCsv);
 
-        public void start();
-        public void start(string ip, int port);
+        int Connect(string ip, int port);
+        void Disconnect();
+        void start();
+        void pause();
 
         /*
          * get most cor receives a field (thats on a csv) and returns which one of the other fields are the most corralitive from the 
@@ -93,7 +95,7 @@ namespace FlightSimADVProg2_ex1.Model
 
 
         int IndexFrame { get; set; }
-
+        string IP { set; get; }
         /*
          * properties of the features
          * 
@@ -163,9 +165,6 @@ namespace FlightSimADVProg2_ex1.Model
         float TurnIndicatorIndicatedTurnRate { set; get; }
         float VerticalSpeedIndicatorIndicatedSpeedFpm { set; get; }
         float EngineRpm { set; get; }
-
-
-
     }
 
 }

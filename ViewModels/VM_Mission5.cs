@@ -41,7 +41,7 @@ namespace FlightSimADVProg2_ex1.ViewModels
         }
 
 
-        public void Start()
+        public void StartAnimation()
         {
             // Starts automaticly when needed.
         }

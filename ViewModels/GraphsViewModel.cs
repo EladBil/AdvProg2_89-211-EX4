@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 using FlightSimADVProg2_ex1.Model;
+using DrawingDLL;
 
 namespace FlightSimADVProg2_ex1.ViewModels
 {
@@ -211,17 +212,52 @@ namespace FlightSimADVProg2_ex1.ViewModels
             }
         }
 
+        
+
 
         public void Initialize()
         {
             InitNumOfFrames();
             InitListAttributesNames();
+            List<int> temp = this.model.AnomalyAd("anomaly_flight.csv");
+            this.FramesOfAnomaly = temp.ToArray();
+            int x;
         }
 
-        public void Start()
+        public void StartAnimation()
         {
             VM_StartGraphics = true;
         }
+
+
+        private UserControl1 AnomalyView;
+        public UserControl1 AnomalyViewProperty
+        {
+            get { return this.AnomalyView; }
+            set 
+            {
+                this.AnomalyView = value;
+                this.UserViewSet = true;
+            }
+        }
+
+
+        private int[] FramesOfAnomaly;
+        public int[] FramesAnomlayProperty
+        {
+            get { return this.FramesOfAnomaly; }
+        }
+
+
+        private bool UserViewSet = false;
+        public bool UserViewSetProperty
+        {
+            get
+            {
+                return this.UserViewSet;
+            }
+        }
+
     }
 
 }

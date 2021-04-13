@@ -7,6 +7,6 @@ namespace FlightSimADVProg2_ex1.ViewModels
     interface IViewModel
     {
         public void Initialize();
-        public void Start();
+        public void StartAnimation();
     }
 }

@@ -6,6 +6,7 @@ using System;
 
 using FlightSimADVProg2_ex1.Model;
 using FlightSimADVProg2_ex1.ViewModels;
+using DrawingDLL;
 
 namespace FlightSimADVProg2_ex1.SubViews
 {
@@ -124,6 +125,12 @@ namespace FlightSimADVProg2_ex1.SubViews
             {
                 ParamAndCorrelativeGraph.Render();
             }));
+            if (this.gvm.UserViewSetProperty)
+            {
+                this.gvm.AnomalyViewProperty.CallDraw(
+                    this.gvm.VM_ChosenAttributeValues, this.gvm.VM_CorrelativeAttributeValues, 
+                    this.gvm.FramesAnomlayProperty, this.gvm.VM_IndexFrame);
+            }
         }
 
 

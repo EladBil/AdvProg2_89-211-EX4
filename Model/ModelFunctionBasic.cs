@@ -16,7 +16,7 @@ namespace FlightSimADVProg2_ex1.Model
     /// Interface for the model
     /// </summary>
 
-    public partial class MyModel : IModel
+    partial class MyModel : IModel
     {
 
 
@@ -60,13 +60,13 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         /// <param name="ip"></param>
         /// <param name="port"></param>
-        public void Connect(string ip, int port)
+        public int Connect(string ip, int port)
         {
             this.ip = ip;
             this.port = port;
 
             this.telnetClientFlightGear.Connect(this.ip, this.port);
-
+            return 0;
 
         }
         /// <summary>
@@ -81,48 +81,85 @@ namespace FlightSimADVProg2_ex1.Model
         /// Initiates a process by which it takes a line from the ts and sends
         /// it to flight gear and updates all the fields accordingly
         /// </summary>
-        public void start(string ip, int port)
-        {
-
-            TcpClient client = new TcpClient(ip, port);
-            new Thread(delegate ()
-            {
-
-                NetworkStream stream = client.GetStream();
-                while (!stop)
-                {
-                    string line;
-
-                    this.arrayRowNow = ts.TsGetRow(IndexFrame);
-                    // convert vectorFloat from dll to arrayFloat in c#
-                    this.updateAllattributes(arrayRowNow);
-                    line = String.Join(",", arrayRowNow);
-                    line += "\r\n";
-                    Byte[] data = System.Text.Encoding.ASCII.GetBytes(line);
-                    stream.Write(data, 0, data.Length);
-                    //telnetClientFlightGear.Write(line);
-                    IndexFrame++;
-
-                    Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
-                    if (IndexFrame >= this.countRows)
-                    {
-                        stop = true;
-
-                    }
-                }
-
-
-                client.Close();
-            }).Start();
-
-
-        }
         public void start()
         {
 
-            new Thread(delegate ()
+
+            // Console.WriteLine("start()");
+            if (this.fileCSV.Equals(""))
+            {
+                Console.WriteLine("The appropriate files must be uploaded");
+                return;
+            }
+            if (!this.telnetClientFlightGear.isConnected())
+            {
+                start2();
+                return;
+            }
+            this.stop = false;
+            if (IndexFrame >= this.countRows)
+            {
+                stop = true;
+
+            }
+            try
             {
 
+
+                new Thread(delegate ()
+                {
+
+                    while (!stop)
+                    {
+                        string line;
+
+                        this.arrayRowNow = ts.TsGetRow(IndexFrame);
+                        // convert vectorFloat from dll to arrayFloat in c#
+                        this.updateAllattributes(arrayRowNow);
+                        line = String.Join(",", arrayRowNow);
+                        line += "\r\n";
+
+                        this.telnetClientFlightGear.Write(line);
+                        IndexFrame++;
+
+                        Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
+                        if (IndexFrame >= this.countRows)
+                        {
+                            stop = true;
+
+                        }
+                    }
+
+
+
+                }).Start();
+
+
+            }
+            catch (SocketException)
+            {
+                this.start2();
+            }
+
+
+        }
+        public void start2()
+        {
+            //Console.WriteLine("start2()");
+            if (this.fileCSV.Equals(""))
+            {
+                Console.WriteLine("The appropriate files must be uploaded");
+                return;
+            }
+            Console.WriteLine("start2()");
+            new Thread(delegate ()
+            {
+                stop = false;
+                if (IndexFrame >= this.countRows)
+                {
+                    stop = true;
+
+                }
                 while (!stop)
                 {
 
@@ -130,6 +167,10 @@ namespace FlightSimADVProg2_ex1.Model
                     this.arrayRowNow = ts.TsGetRow(IndexFrame);
                     // convert vectorFloat from dll to arrayFloat in c#
                     this.updateAllattributes(arrayRowNow);
+                    string line;
+                    line = String.Join(",", arrayRowNow);
+                    line += "\r\n";
+
 
 
                     IndexFrame++;
@@ -150,7 +191,10 @@ namespace FlightSimADVProg2_ex1.Model
 
 
         }
-
+        public void pause()
+        {
+            this.Stop = true;
+        }
         /// <summary>
         /// Update the fields
         /// </summary>
@@ -681,7 +725,10 @@ namespace FlightSimADVProg2_ex1.Model
                 NotifyPropertyChanged("engineRpm");
             }
         }
-
+        /// <summary>
+        /// Report to anyone registered that the value has changed
+        /// </summary>
+        /// <param name="propName">Name of value changed</param>
 
         private void NotifyPropertyChanged(string propName)
         {
@@ -693,7 +740,6 @@ namespace FlightSimADVProg2_ex1.Model
         }
 
     }
-
 
 
 

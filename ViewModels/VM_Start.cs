@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
+
+using DrawingDLL;
 using FlightSimADVProg2_ex1.Model;
 
 namespace FlightSimADVProg2_ex1.ViewModels
@@ -36,6 +38,7 @@ namespace FlightSimADVProg2_ex1.ViewModels
             this.VMGroundRelativeView = new VM_Mission5(this.model);
             this.VMGraphs = new GraphsViewModel(this.model);
             this.VMJoystick = new VM_Joystick(this.model);
+            this.VMPlaybackControls = new PlaybackControlsViewModel(this.model);
         }
         
         public event PropertyChangedEventHandler PropertyChanged;
@@ -70,6 +73,12 @@ namespace FlightSimADVProg2_ex1.ViewModels
         }
 
 
+        private PlaybackControlsViewModel VMPlaybackControls;
+        public PlaybackControlsViewModel VMPlaybackControlsProperty
+        {
+            get { return this.VMPlaybackControls; }
+        }
+
         private string APIFileName;
         public string VM_APIFileName
         {
@@ -103,27 +112,27 @@ namespace FlightSimADVProg2_ex1.ViewModels
             // After calling LoadCSV we have the all the values of the attributes of the flight.
             // And we have the number of Frames.
             LoadCSV(CSVFileName);
+            
             VMGraphs.Initialize();
             VM_GroundRelativeView.Initialize();
+            VMPlaybackControls.Initialize();
         }
-        //conects to the flight gear
-        public void ConnectFG(string ip, int port)
+
+        public void StartAnimation()
         {
-            this.model.Connect(ip, port);
+            // No need to add something in here.
         }
-        //disconects from the flight gear
-        public void DisconnectFG()
+
+
+        private UserControl1 UserViewGraph;
+        public UserControl1 UserViewProperty
         {
-            this.model.Disconnect();
-        }
-        //Plays the flight gear
-        public void Start()
-        {
-            this.model.start();
-        }
-        public void Pause()
-        {
-            this.model.pause();
+            get { return this.UserViewGraph; }
+            set
+            {
+                this.UserViewGraph = value;
+                this.VMGraphs.AnomalyViewProperty = this.UserViewGraph;
+            }
         }
     }
 }

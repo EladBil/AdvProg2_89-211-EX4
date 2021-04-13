@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 
 using FlightSimADVProg2_ex1.Model;
 using FlightSimADVProg2_ex1.ViewModels;
+using DrawingDLL;
+
 
 namespace FlightSimADVProg2_ex1
 {
@@ -32,10 +34,12 @@ namespace FlightSimADVProg2_ex1
             VMStart.VM_APIFileName = "playback_small.xml";
             VMStart.VM_CSVFileName = "reg_flight.csv";
             GraphsView.GivenGraphsViewModel = this.VMStart.VM_Graphs;
+            VMStart.UserViewProperty = AnomalyDetectionView;
             GroundRelativeView.GivenGroundRelativeViewModel = this.VMStart.VM_GroundRelativeView;
             JoystickView.GivenJoystickVM = this.VMStart.VMJoystickProperty;
+            PlaybackControlView.GivenPlaybackViewModel = this.VMStart.VMPlaybackControlsProperty;
             VMStart.Initialize();
-            VMStart.Start();
+            VMStart.StartAnimation();
         }
 
         private void GroundRelativeView_Loaded(object sender, RoutedEventArgs e)
