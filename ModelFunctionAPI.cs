@@ -306,11 +306,11 @@ namespace FlightSimADVProg2_ex1.Model
 
 
         /// <summary>
-        /// Calculate the anomalies using dll functions for Circle
+        /// Calculate the anomalies using dll functions 
         /// </summary>
-        /// <param name="learnHibridCsv">A path of a file for learning the algorithm</param>
-        /// <returns>list of anomalies based off of circle (HAD)</returns>
-        public List<int> AnomalyAd(string learnHibridCsv)
+        /// <param name="learnCSV">A path of a file for learning the algorithm</param>
+        /// <returns>list of anomalies </returns>
+        public List<int> DetectAnomaly(string learnCSV)
         {
             if (this.fileCSV.Equals(""))
             {
@@ -320,7 +320,7 @@ namespace FlightSimADVProg2_ex1.Model
             string learnHibridCsvToWork = "learnAdCsvToWork.csv";
             //create ts to learnNormalCsv
             var lineCount = 0;
-            using (var reader = File.OpenText(learnHibridCsv))
+            using (var reader = File.OpenText(learnCSV))
             {
                 while (reader.ReadLine() != null)
                 {
@@ -334,7 +334,7 @@ namespace FlightSimADVProg2_ex1.Model
             string data = "";
             File.WriteAllText(learnHibridCsvToWork, data);
 
-            Scattering.AddFirstLineInCsv(learnHibridCsv, learnHibridCsvToWork, this.firstLine);
+            Scattering.AddFirstLineInCsv(learnCSV, learnHibridCsvToWork, this.firstLine);
 
             TimeSeriesModel tsNormal = new TimeSeriesModel(learnHibridCsvToWork);
 

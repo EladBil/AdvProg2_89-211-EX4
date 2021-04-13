@@ -72,7 +72,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         /// <param name="learnNormalCsv"></param>
         /// <returns></returns>
-        List<int> AnomalyAd(string learnNormalCsv);
+        List<int> DetectAnomaly(string learnNormalCsv);
 
       int Connect(string ip, int port);
        void Disconnect();
@@ -93,7 +93,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// <returns></returns>
         string GetMostCor(string givenIndex);
 
-
+       
         int IndexFrame { get; set; }
         string IP { set; get; }
         /*
