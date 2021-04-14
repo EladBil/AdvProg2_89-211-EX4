@@ -93,6 +93,17 @@ namespace FlightSimADVProg2_ex1.ViewModels
             set { CSVFileName = value; }
         }
 
+        private string AnomalyCSVFileName;
+        public string VM_AnomalyCSVFileName
+        {
+            get { return this.AnomalyCSVFileName; }
+            set 
+            {
+                this.AnomalyCSVFileName = value;
+                this.VMGraphs.AnomalyXMLFilePathProperty = this.AnomalyCSVFileName;
+            }
+        }
+
         //load the API upon start of program
         private void LoadAPI(string fileAPI)
         {

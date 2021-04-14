@@ -173,6 +173,8 @@ namespace FlightSimADVProg2_ex1.ViewModels
             }
             return array;
         }
+
+
         //retruns the array of most correlated feature
         private double[] CorChange(List<float> list)
         {
@@ -203,6 +205,7 @@ namespace FlightSimADVProg2_ex1.ViewModels
             get { return this.ListAttributesNames; }
         }
 
+
         private void InitListAttributesNames()
         {
             this.ListAttributesNames = model.GetListOfAttribute();
@@ -212,17 +215,15 @@ namespace FlightSimADVProg2_ex1.ViewModels
             }
         }
 
-        
-
 
         public void Initialize()
         {
             InitNumOfFrames();
             InitListAttributesNames();
-            List<int> temp = this.model.AnomalyAd("anomaly_flight.csv");
+            List<int> temp = this.model.AnomalyAd(this.AnomalyXMLFilePath);
             this.FramesOfAnomaly = temp.ToArray();
-            int x;
         }
+
 
         public void StartAnimation()
         {
@@ -238,6 +239,17 @@ namespace FlightSimADVProg2_ex1.ViewModels
             {
                 this.AnomalyView = value;
                 this.UserViewSet = true;
+            }
+        }
+
+
+        private string AnomalyXMLFilePath;
+        public string AnomalyXMLFilePathProperty
+        {
+            get { return this.AnomalyXMLFilePath; }
+            set
+            {
+                this.AnomalyXMLFilePath = value;
             }
         }
 

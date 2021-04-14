@@ -30,9 +30,15 @@ namespace FlightSimADVProg2_ex1
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+
+        public void StartMainWindow()
+        {
             VMStart = new VM_Start();
-            VMStart.VM_APIFileName = "playback_small.xml";
-            VMStart.VM_CSVFileName = "reg_flight.csv";
+            VMStart.VM_APIFileName = this.MWAPI;
+            VMStart.VM_CSVFileName = this.MWCSV;
+            VMStart.VM_AnomalyCSVFileName = this.MWAnomaly;
             GraphsView.GivenGraphsViewModel = this.VMStart.VM_Graphs;
             VMStart.UserViewProperty = AnomalyDetectionView;
             GroundRelativeView.GivenGroundRelativeViewModel = this.VMStart.VM_GroundRelativeView;
@@ -41,6 +47,31 @@ namespace FlightSimADVProg2_ex1
             VMStart.Initialize();
             VMStart.StartAnimation();
         }
+
+
+        private string MWAPI;
+        public string MainWindowAPIPathProperty
+        {
+            get { return this.MWAPI; }
+            set { this.MWAPI = value; }
+        }
+
+
+        private string MWCSV;
+        public string MainWindowCSVPathProperty
+        {
+            get { return this.MWCSV; }
+            set { this.MWCSV = value; }
+        }
+
+
+        private string MWAnomaly;
+        public string MainWindowAnomalPathProperty
+        {
+            get { return this.MWAnomaly; }
+            set { this.MWAnomaly = value; }
+        }
+
 
         private void GroundRelativeView_Loaded(object sender, RoutedEventArgs e)
         {
