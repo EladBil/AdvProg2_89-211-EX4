@@ -41,6 +41,7 @@ namespace FlightSimADVProg2_ex1.SubViews
         private void InitializeByModel()
         {
             DataContext = this.pcvm;
+            UpdateLayout();
         }
 
 

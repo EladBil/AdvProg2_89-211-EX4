@@ -32,6 +32,7 @@ namespace FlightSimADVProg2_ex1
         {
             this.MainScreen.StartMainWindow();
             this.MainScreen.Show();
+            this.Close();
         }
 
         private void OPENCSVBUTTON_Clicked(object sender, RoutedEventArgs e)

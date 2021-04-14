@@ -145,5 +145,11 @@ namespace FlightSimADVProg2_ex1.ViewModels
                 this.VMGraphs.AnomalyViewProperty = this.UserViewGraph;
             }
         }
+
+
+        public void Stop()
+        {
+            this.VMPlaybackControls.Pause();
+        }
     }
 }

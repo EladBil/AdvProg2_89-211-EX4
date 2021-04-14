@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1024"
         xmlns:controls1="clr-namespace:FlightSimADVProg2_ex1.SubViews"
-        xmlns:controls2="clr-namespace:DrawingDLL;assembly=DrawingDLL">
+        xmlns:controls2="clr-namespace:DrawingDLL;assembly=DrawingDLL"
+        Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5*"/>

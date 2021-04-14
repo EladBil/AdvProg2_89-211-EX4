@@ -40,11 +40,11 @@ namespace FlightSimADVProg2_ex1
             VMStart.VM_CSVFileName = this.MWCSV;
             VMStart.VM_AnomalyCSVFileName = this.MWAnomaly;
             GraphsView.GivenGraphsViewModel = this.VMStart.VM_Graphs;
+            VMStart.Initialize();
             VMStart.UserViewProperty = AnomalyDetectionView;
             GroundRelativeView.GivenGroundRelativeViewModel = this.VMStart.VM_GroundRelativeView;
             JoystickView.GivenJoystickVM = this.VMStart.VMJoystickProperty;
             PlaybackControlView.GivenPlaybackViewModel = this.VMStart.VMPlaybackControlsProperty;
-            VMStart.Initialize();
             VMStart.StartAnimation();
         }
 
@@ -81,6 +81,11 @@ namespace FlightSimADVProg2_ex1
         private void GraphsView_Loaded(object sender, RoutedEventArgs e)
         {
             
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            this.VMStart.Stop();
         }
     }
 }
