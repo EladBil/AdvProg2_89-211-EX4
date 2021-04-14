@@ -14,7 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 
-namespace model
+namespace FlightSimADVProg2_ex1.Model
 {
     class MiliSecondAndRate
     {
