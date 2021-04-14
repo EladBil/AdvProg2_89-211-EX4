@@ -6,6 +6,11 @@ Authors: Elad Bilman, Shmuel Yaish. Yedidya Bachar
 
 Note: This program runs on an x86 platform. Please make sure your device is compatable with x86 framework before running.
 
+Announcement: We would also like to mention that one of our very own creators, Shmuel Yaish, created
+a video explaining how to create a C++ dll to use in C# that was viewed 
+and used by most of the class and has helped so far over 600 people! 
+You can watch the turorial at this link https://www.youtube.com/watch?v=3efOjwKb9p4&t=910s
+
 Operating Instructions:
 
 1. Download and Install the flight gear app from https://www.flightgear.org/
@@ -47,3 +52,38 @@ After the app has uploaded
 9.Press start
 
 10.The app will begin to run and display the Flight Gear and all 
+
+About the design:
+The program is based on the MVVM design pattern. There is the Start window and
+Main Window which are in the main directory.
+The other folders work as follows:
+
+Subviews:
+These are displays including, but not limited to, the Joystick which displays the aileron 
+and the elevator. The PlaybackView, which displays a scroll bar to select a frame to jump to,
+pause button, play button, and a video playback speed controler! There is also GraphsView
+which displays a selected detail of the flight along with it's most correlated feature,
+and calls the DLL to display the anomalys of those features. And much more!
+
+View Models:
+These are VM's to connect the veiw with the model. There are multiple VM's so that different
+parts of the program are independent of other parts, creating modularity in the program.
+In addition, there is VM_Start which is also used to initiate the other View Models and 
+to get the program started.
+
+Model:
+The model is based on the interface IModel. For easy use and read the model is divided up
+into partial classes such as ModelFunctionBasics, the constructor and the getters and 
+setters of the flight details, and ModelFunctionAPI with the calculation algorithms.
+There is also ITelnetClient which is an interface of a socket which connects you to the flight
+gear. In addition there is anomalAlgorithms which wraps the information coming in from the
+C++ dll so the model doesn't have to deal with the dll.
+
+Plug-ins:
+Our program works with C++ and C# dlls. The C++ dll is used by the model to calculate
+the anomalies and deal with the information coming in from the flight CSV file. In
+addition we have the C# dll which displays the anomalies on the screen based off the type
+of the anomaly. Our program does not know what type of anomly we are testing looking for,
+therefor it has outsourced it's anomaly calculations to an external dll so that you can
+check and display any type of anomaly you'd like!
+
