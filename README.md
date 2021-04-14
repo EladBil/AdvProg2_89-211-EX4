@@ -35,10 +35,10 @@ The following dll files must be placed in the folder of the app's executable.
 5.2.1. A function: CallDraw(double[] x, double[] y, int[] z, int w) 
 5.2.1. The xaml class of the DLL must be called "UserControl1"
 
-
+After the app has uploaded
 6.Enter the path of the xml file in the appropriate place 
 
-7.Enter the path of flight data file you want to explore in the appropriate place 
+7.Enter the path of flight data file that you want to explore in the appropriate place 
 
 8.Enter the path of flight data file that you want the anomaly detection system to learn to make a comparison in the appropriate place 
 
