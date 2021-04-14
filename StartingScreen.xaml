@@ -17,11 +17,11 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Button Grid.Row="1" Grid.Column="0" Content="Open XML File" Click="OpenPropertXml_Clicked"/>
+        <Button Grid.Row="1" Grid.Column="0" Content="Open Property XML File" Click="OpenPropertXml_Clicked"/>
         <Button Grid.Row="1" Grid.Column="1"
-                Content="Open CSV File" Click="OPENCSVBUTTON_Clicked"/>
+                Content="Open Main Flight CSV File" Click="OPENCSVBUTTON_Clicked"/>
         <Button Grid.Row="1" Grid.Column="2"
-                Content="Open Flight Anomaly SCV" Click="OpenAnomalyCSV_Clicked"
+                Content="Open Flight Anomaly CSV" Click="OpenAnomalyCSV_Clicked"
                />
         <Button Grid.Row="2" Grid.Column="1" Content="Let's Start!" Click="LetsStart_Clicked"/>
     </Grid>
