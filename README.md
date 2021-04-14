@@ -100,3 +100,11 @@ of the anomaly. Our program does not know what type of anomly we are testing loo
 therefor it has outsourced it's anomaly calculations to an external dll so that you can
 check and display any type of anomaly you'd like!
 
+In Order make changes to the project code itself you will need:
+- Visual Studio 2019 ver16.9.3
+  - The visual studio will need to have c++ extensions and WPF.
+- We are using a UI library for our graphs names: Scott Plot. You must download this library extension
+  via Nuget built-in, in order to change the project.
+  Link to the original UI git:  https://github.com/ScottPlot/ScottPlot
+  Link to the library cookbook:   https://swharden.com/scottplot/cookbooks/4.0.47/
+  
