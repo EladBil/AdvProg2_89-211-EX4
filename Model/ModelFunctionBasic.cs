@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.ComponentModel;
@@ -9,11 +9,17 @@ using System.Runtime.InteropServices;
 using System.Net.Sockets;
 using System.Diagnostics;
 
-
 namespace FlightSimADVProg2_ex1.Model
 {
     /// <summary>
-    /// Interface for the model
+    /// For convenience we have divided the class of the model into two separate parts
+    /// One section is responsible for maintaining the latest flight variables and updating them on listeners in the file "ModelFunctionBasic"
+    /// And part two is responsible for the functions of the model, implemented in the file "ModelFunctionAPI"
+    /// 
+    /// 
+    /// Part of the basic class model
+    /// In this part of the model all property םf the variables of the aircraft which need to be constantly updated rapidlyis
+    /// That when they change they report notification to PropertyChangedEventHandler
     /// </summary>
 
     partial class MyModel : IModel
@@ -22,18 +28,8 @@ namespace FlightSimADVProg2_ex1.Model
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        readonly ITelnetClient telnetClientFlightGear;
-        private Boolean stop;
+        private bool isStartWork;
 
-        public Boolean Stop
-        {
-
-            set
-            {
-                this.stop = value;
-            }
-
-        }
 
 
         /// <summary>
@@ -44,9 +40,12 @@ namespace FlightSimADVProg2_ex1.Model
         {
             this.telnetClientFlightGear = telnetClient;
             stop = false;
-
+            this.isStartWork = false;
+            //Boot the speed within the dictionary
+            //key - relative number
+            //value - class of MiliSecondAndRate
             this.speedToMillisecondAndRate = new Dictionary<float, MiliSecondAndRate>();
-            speedToMillisecondAndRate.Add(0, new MiliSecondAndRate(500, 2));
+            speedToMillisecondAndRate.Add(0, new MiliSecondAndRate(500 , 2));
             speedToMillisecondAndRate.Add((float)0.25, new MiliSecondAndRate(250, 4));
             speedToMillisecondAndRate.Add((float)0.5, new MiliSecondAndRate(200, 5));
             speedToMillisecondAndRate.Add(1, new MiliSecondAndRate(100, 10));
@@ -56,147 +55,18 @@ namespace FlightSimADVProg2_ex1.Model
 
         }
         /// <summary>
-        /// Connects to flight gear using telnetClientFlightGear
+        /// The stop function stops the process of reading the start function
+        // if the start function works
         /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
-        public int Connect(string ip, int port)
-        {
-            this.ip = ip;
-            this.port = port;
-
-            this.telnetClientFlightGear.Connect(this.ip, this.port);
-            return 0;
-
-        }
-        /// <summary>
-        /// disconnect from flight gear
-        /// </summary>
-        public void Disconnect()
-        {
-            stop = true;
-            telnetClientFlightGear.Disconnect();
-        }
-        /// <summary>
-        /// Initiates a process by which it takes a line from the ts and sends
-        /// it to flight gear and updates all the fields accordingly
-        /// </summary>
-        public void start()
-        {
-
-
-            // Console.WriteLine("start()");
-            if (this.fileCSV.Equals(""))
-            {
-                Console.WriteLine("The appropriate files must be uploaded");
-                return;
-            }
-            if (!this.telnetClientFlightGear.isConnected())
-            {
-                start2();
-                return;
-            }
-            this.stop = false;
-            if (IndexFrame >= this.countRows)
-            {
-                stop = true;
-
-            }
-            try
-            {
-
-
-                new Thread(delegate ()
-                {
-
-                    while (!stop)
-                    {
-                        string line;
-
-                        this.arrayRowNow = ts.TsGetRow(IndexFrame);
-                        // convert vectorFloat from dll to arrayFloat in c#
-                        this.updateAllattributes(arrayRowNow);
-                        line = String.Join(",", arrayRowNow);
-                        line += "\r\n";
-
-                        this.telnetClientFlightGear.Write(line);
-                        IndexFrame++;
-
-                        Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
-                        if (IndexFrame >= this.countRows)
-                        {
-                            stop = true;
-
-                        }
-                    }
-
-
-
-                }).Start();
-
-
-            }
-            catch (SocketException)
-            {
-                this.start2();
-            }
-
-
-        }
-        public void start2()
-        {
-            //Console.WriteLine("start2()");
-            if (this.fileCSV.Equals(""))
-            {
-                Console.WriteLine("The appropriate files must be uploaded");
-                return;
-            }
-            Console.WriteLine("start2()");
-            new Thread(delegate ()
-            {
-                stop = false;
-                if (IndexFrame >= this.countRows)
-                {
-                    stop = true;
-
-                }
-                while (!stop)
-                {
-
-
-                    this.arrayRowNow = ts.TsGetRow(IndexFrame);
-                    // convert vectorFloat from dll to arrayFloat in c#
-                    this.updateAllattributes(arrayRowNow);
-                    string line;
-                    line = String.Join(",", arrayRowNow);
-                    line += "\r\n";
-
-
-
-                    IndexFrame++;
-
-                    Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
-
-                    if (IndexFrame >= this.countRows)
-                    {
-                        stop = true;
-
-                    }
-
-                }
-                //telnetClientFlightGear.Disconnect();
-
-
-            }).Start();
-
-
-        }
         public void pause()
         {
             this.Stop = true;
         }
         /// <summary>
         /// Update the fields
+        /// The update is done by searching the dictionary for the number that corresponds to the name
+       /// and then extracting the appropriate entry from the dictionary
+        /// and placement into the variable
         /// </summary>
         /// <param name="arrayValue"></param>
         private void updateAllattributes(float[] arrayValue)
@@ -740,8 +610,5 @@ namespace FlightSimADVProg2_ex1.Model
         }
 
     }
-
-
-
 
 }
