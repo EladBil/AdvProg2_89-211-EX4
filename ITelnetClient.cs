@@ -7,25 +7,43 @@ using System.Net;
 
 namespace FlightSimADVProg2_ex1.Model
 {
+    /// <summary>
+    /// An interface whose function is to wrap the entire connection with an external server
+    /// Performs basic server communication operations
+    /// </summary>
     interface ITelnetClient
     {
         int Connect(string ip, int port);
         void Write(string command);
-        string Read(); // blocking call
+        string Read(); 
         void Disconnect();
+        /// <summary>
+        /// Returns whether the connection is correct
+        /// </summary>
+        /// <returns>bool</returns>
         bool isConnected();
 
     }
 
-
+    /// <summary>
+    /// Our implementation aims to create a shell between the model and the socket and connect and send the data
+    /// </summary>
     class MyTelnetFlightGearClientTCP : ITelnetClient
     {
         TcpClient client;
         NetworkStream stream;
         byte[] bytes = new byte[4098];
-        
 
 
+        /// <summary>
+        /// Establishes a connection with the server
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <returns>
+        /// 0 success
+        /// -1 failed
+        /// </returns>
         public int Connect(string ip, int port)
         {
             // Connect to a Remote server  
@@ -45,15 +63,13 @@ namespace FlightSimADVProg2_ex1.Model
             }
             return 0;
         }
+        /// <summary>
+        /// write string to server
+        /// </summary>
+        /// <param name="command"> string to send</param>
         public void Write(string command)
         {
 
-           /* if(this.stream == null)
-            {
-                Console.WriteLine("no Connection");
-                return;
-              
-            }*/
             try
             {
                 Byte[] data = System.Text.Encoding.ASCII.GetBytes(command);
@@ -75,6 +91,10 @@ namespace FlightSimADVProg2_ex1.Model
                 Console.WriteLine("Unexpected exception : {0}", e.ToString());
             }
         }
+        /// <summary>
+        /// Irrelevant reading in our project
+        /// </summary>
+        /// <returns></returns>
         public string Read()
         {
             try
@@ -99,6 +119,9 @@ namespace FlightSimADVProg2_ex1.Model
             }
             return "-1";
         }
+        /// <summary>
+        ///disconnect form server
+        /// </summary>
         public void Disconnect()
         {
             try
@@ -119,7 +142,10 @@ namespace FlightSimADVProg2_ex1.Model
                 Console.WriteLine("Unexpected exception : {0}", e.ToString());
             }
         }
-
+        /// <summary>
+        /// Check if there is a connection by checking the stream and socket
+        /// </summary>
+        /// <returns></returns>
         public bool isConnected()
         {
             if (this.client == null || this.stream == null)
@@ -132,7 +158,9 @@ namespace FlightSimADVProg2_ex1.Model
     }
 
 
-
+    /// <summary>
+    /// The class was written as an option for udp communication but is not used in our project
+    /// </summary>
     class MyTelnetFlightGearClientUDP : ITelnetClient
     {
 

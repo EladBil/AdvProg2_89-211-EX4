@@ -5,6 +5,14 @@ using System.Text;
 
 namespace FlightSimADVProg2_ex1.Model
 {
+    /// <summary>
+    /// The model interface
+    ///The model is designed to be part of the mvvm architecture
+    ///As part of the above architecture the model does not know who is using its functions such as view model and view
+    ///For this purpose, the model actually uses the "INotifyPropertyChanged" interface, which reports automatically as soon as subscribers subscribe to it.
+    ///In our project the role of the model is to carry out the logic of flight data analysis
+    ///For this purpose it is literally functions whose details appear below
+    /// </summary>
     public interface IModel : INotifyPropertyChanged
     {
 
@@ -73,11 +81,25 @@ namespace FlightSimADVProg2_ex1.Model
         /// <param name="learnNormalCsv"></param>
         /// <returns></returns>
         List<int> DetectAnomaly(string learnNormalCsv);
-
-      int Connect(string ip, int port);
-       void Disconnect();
-       void start();
-       void pause();
+        /// <summary>
+        /// Need to connect to a source to send or read data from
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <returns>Value of failure (-1) or success(0)</returns>
+        int Connect(string ip, int port);
+        /// <summary>
+        /// Disconnects
+        /// </summary>
+        void Disconnect();
+        /// <summary>
+        /// The function should start the data reading process update and send to all notify
+        /// </summary>
+        void start();
+        /// <summary>
+        /// The function should stop the start function
+        /// </summary>
+        void pause();
 
         /*
          * get most cor receives a field (thats on a csv) and returns which one of the other fields are the most corralitive from the 
@@ -98,6 +120,8 @@ namespace FlightSimADVProg2_ex1.Model
         string IP { set; get; }
         /*
          * properties of the features
+         * For each variable of the flight we implement property for easy
+         * access to the variable without creating geters and setters
          * 
          */
 

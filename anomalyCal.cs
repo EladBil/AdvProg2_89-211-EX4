@@ -4,6 +4,13 @@ using System.Text;
 
 namespace FlightSimADVProg2_ex1.Model
 {
+	/// <summary>
+	/// The department calculates calculations needed for the model
+	/// Various
+	/// average
+	/// The regression line
+	/// covariance
+	/// </summary>
 	class anomaly
 	{
 		public static float avg(List<float> x)
@@ -36,6 +43,14 @@ namespace FlightSimADVProg2_ex1.Model
 			sum /= x.Count;
 
 			return sum - avg(x) * avg(y);
+		}
+
+		public Line lineReg(List<float> x, List<float> y)
+		{
+			float a = cov(x, y) / var(x);
+			float b = avg(y) - a * avg(x);
+
+			return new Line(a, b);
 		}
 
 		public static float pearson(List<float> x, List<float> y)

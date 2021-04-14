@@ -120,18 +120,29 @@ namespace FlightSimADVProg2_ex1.Model
         {
             return this.amountAttribute;
         }
-
+        /// <summary>
+        /// Create a list in c # from a vector in c ++
+        /// </summary>
+        /// <param name="p">pointer to vector</param>
+        /// <param name="size"> size of vector</param>
+        /// <returns></returns>
         private List<float> vectorFromIntPtrToList(IntPtr p, int size)
         {
 
             List<float> l = new List<float>();
+            //Copy the entries one after the other into a list
             for (int i = 0; i < size; i++)
             {
                 l.Add(TsGetInRow(p, i));
-                // Console.WriteLine(TsGetInRow(p, i));               
+                
             }
             return l;
         }
+        /// <summary>
+        /// Given a column number the function returns a list of all the values in the column
+        /// </summary>
+        /// <param name="numberCol"></param>
+        /// <returns></returns>
         public List<float> GetValuesSpecificAttribute(int numberCol)
         {
 
@@ -140,11 +151,16 @@ namespace FlightSimADVProg2_ex1.Model
             TsDeleteRow(intPtr);
             return l;
         }
+        /// <summary>
+        /// Given a column number the function returns the value that exists in the current row in the above column
+        /// </summary>
+        /// <param name="indexAttribute"></param>
+        /// <returns></returns>
         public float TsGetInRow(int indexAttribute)
         {
             return TsGetInRow(rowNow, indexAttribute);
         }
-
+        //Calculations needed for model
         public float varFromColIndex(int indexCol)
         {
             return varFromColIndex(this.tsP, indexCol);
@@ -170,10 +186,17 @@ namespace FlightSimADVProg2_ex1.Model
            
             return pearsonFromColIndex(this.tsP, indexCol1, indexCol2);
         }
+        /// <summary>
+        /// Returns the pointer to timeseries
+        /// </summary>
+        /// <returns></returns>
         public IntPtr GetIntP()
         {
             return this.tsP;
         }
+        /// <summary>
+        /// Demolition of timeseries
+        /// </summary>
         public void destroyTs()
         {
             TsDelete(this.tsP);

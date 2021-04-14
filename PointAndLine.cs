@@ -28,7 +28,10 @@ namespace FlightSimADVProg2_ex1.Model
       }*/
 
 
-
+    /// <summary>
+    /// The class is needed to create a regression line between variables
+    /// The line contains a gradient (a) and a constant (b)
+    /// </summary>
     public class Line
     {
 
@@ -38,7 +41,9 @@ namespace FlightSimADVProg2_ex1.Model
             this.a = a;
             this.b = b;
         }
-
+        /// <summary>
+        /// property
+        /// </summary>
         public float A
         {
             get
@@ -65,14 +70,15 @@ namespace FlightSimADVProg2_ex1.Model
 
         }
 
-
+        /// <summary>
+        /// Enter x to calculate the y on the line
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public float F(float x)
         {
             return a * x + b;
         }
     }
-
-
-
 
 }
