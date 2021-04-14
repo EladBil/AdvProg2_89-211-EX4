@@ -13,6 +13,7 @@ You can watch the turorial at this link https://www.youtube.com/watch?v=3efOjwKb
 
 Video explaining our project:
 Part 1: https://youtu.be/Xk6Z57QrCIU
+
 Part 2: https://youtu.be/libUHjocNaA
 
 Operating Instructions:
@@ -47,7 +48,8 @@ The following dll files must be placed in the folder of the app's executable.
 7.When you have finished preparing, click on the file  "FlightSimADVProg2_ex1.exe"
 
 
-After the app has uploaded
+After the app has uploaded:
+
 8.Enter the path of the xml file in the appropriate place 
 
 9.Enter the path of flight data file that you want to explore in the appropriate place 
