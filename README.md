@@ -59,7 +59,7 @@ After the app has uploaded:
 
 11.Press start
 
-12.The app will begin to run and display the Flight Gear and all 
+12.The app will begin to run and display the Flight Gear and all the displays and controls
 
 About the design:
 
