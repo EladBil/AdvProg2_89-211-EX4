@@ -1,6 +1,8 @@
 # AdvProg2_89-211-EX4
 
-Flight Data Analysis 2021 version 1.0 Authors: Elad Bilman Shmuel Yaish Yedidya Bachar
+Flight Data Analysis 2021, 
+version 1.0, 
+Authors: Elad Bilman, Shmuel Yaish. Yedidya Bachar
 
 Note: This program runs on an x86 platform. Please make sure your device is compatable with x86 framework before running.
 
