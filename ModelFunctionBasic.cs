@@ -28,8 +28,8 @@ namespace FlightSimADVProg2_ex1.Model
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        
-        
+        private bool isStartWork;
+
 
 
         /// <summary>
@@ -40,6 +40,7 @@ namespace FlightSimADVProg2_ex1.Model
         {
             this.telnetClientFlightGear = telnetClient;
             stop = false;
+            this.isStartWork = false;
             //Boot the speed within the dictionary
             //key - relative number
             //value - class of MiliSecondAndRate
