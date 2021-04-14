@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,11 +12,18 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace FlightSimADVProg2_ex1.Model
 {
     class MiliSecondAndRate
     {
+        /// <summary>
+        /// MiliSeconds: Several milliseconds of the delay to the start function
+        /// Rate: Number of times per second sent to fg
+        /// </summary>
+        /// <param name="MiliSeconds">Several milliseconds of the delay to the start function</param>
+        /// <param name="Rate"> Number of times per second sent to fg</param>
         public MiliSecondAndRate(int MiliSeconds, int Rate)
         {
             this.MiliSeconds = MiliSeconds;
@@ -25,8 +32,21 @@ namespace FlightSimADVProg2_ex1.Model
         public int MiliSeconds { get; set; }
         public int Rate { get; set; }
 
-
+       
     }
+    /// <summary>
+    /// For convenience we have divided the class of the model into two separate parts
+    /// One section is responsible for maintaining the latest flight variables and updating them on listeners in the file "ModelFunctionBasic"
+    /// And part two is responsible for the functions of the model, implemented in the file "ModelFunctionAPI"
+    /// 
+    /// Part of the Function class model
+    /// In this part of the model class all the logic of the model as a whole is realized
+    /// Create timeseries
+    /// Receive a settings file
+    /// Connecting to flight gear
+    /// Complex calculations for certain requests made on flight data
+    /// As well as running and controlling the rate of change of flight call data
+    /// </summary>
     partial class MyModel : IModel
     {
 
@@ -59,18 +79,23 @@ namespace FlightSimADVProg2_ex1.Model
         /// Holds the number of rows (without the attribute names) of the csv file
         /// </summary>
         private int countRows = 0;
+
+        private ITelnetClient telnetClientFlightGear;
+        
         /// <summary>
         /// Holds the IP of the flight gear
         /// </summary>
         private string ip = "127.0.0.1";
-
-
+       
+        /// <summary>
+        /// property of ip
+        /// </summary>
         public string IP
         {
             get { return this.ip; }
             set
             {
-                this.ip = new string(value);
+                this.ip = new string(value);          
             }
         }
         /// <summary>
@@ -99,14 +124,34 @@ namespace FlightSimADVProg2_ex1.Model
         /// Pointer to timeseries that the current file holder holds
         /// </summary>
         private TimeSeriesModel ts;
+        /// <summary>
+        /// The stop variable determines whether the "start()" function will stop or continue
+        /// </summary>
+        private Boolean stop;
+        /// <summary>
+        /// property for stop
+        /// </summary>
+        public Boolean Stop
+        {
+            set
+            {
+                this.stop = value;
+            }
 
+        }
 
-
-
+       
 
         /// <summary>This method uppload file API and create dictionary 
-        /// Which maps between values and numbers.</summary>
+        /// Which maps between values and numbers.
+        /// Uses the "Scattering.CreatestringOfValues" function to extract the data from the file and insert it into the string
+        /// Uses the "Scattering.CreateDictionaryFromStringCSV" function  to create dictionary from string
+        /// </summary>
         /// <param name="pathFileAPI">the path of file API.</param>
+        /// <returns> 
+        /// 0 - success 
+        /// -1 - failure
+        /// </returns>
         ///
         public int LoadingAPI(string pathFileAPI)
         {
@@ -115,7 +160,7 @@ namespace FlightSimADVProg2_ex1.Model
                 this.fileAPI = pathFileAPI;
                 this.firstLine = Scattering.CreatestringOfValues(pathFileAPI);
                 this.DictValuesToNumInCsv = new Dictionary<string, int>();
-
+                //this variable Will be inserted correctly into our csv files within the attributes bar
                 this.firstLine = Scattering.CreateDictionaryFromStringCSV(this.DictValuesToNumInCsv, this.firstLine);
             }
             catch
@@ -126,18 +171,11 @@ namespace FlightSimADVProg2_ex1.Model
             }
 
             return 0;
-
-            //this.fileAPI = pathFileAPI;
-            //this.firstLine = Scattering.CreatestringOfValues(pathFileAPI);
-            //this.DictValuesToNumInCsv = new Dictionary<string, int>();
-
-            //this.firstLine = Scattering.CreateDictionaryFromStringCSV(this.DictValuesToNumInCsv, this.firstLine);
-
-
-            //return 0;
         }
         /// <summary>
         /// Upload a csv file to explore
+        /// Uses the "Scattering.AddFirstLineInCsv" function to write the line of attributes into the file
+        /// In addition creates a pointer to timeseries
         /// </summary>
         /// <param name="PathFileCSV">The path of the file</param>
         /// <returns>
@@ -153,13 +191,16 @@ namespace FlightSimADVProg2_ex1.Model
             }
             try
             {
+                //Create a new file that we can work on
+                //The reason is that we do not want to destroy the file that the user gave us
                 this.fileCSV = PathFileCSV;
                 string data = "";
                 File.WriteAllText(this.fileCsvToWork, data);
 
                 Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
-
+                //create timeseries
                 this.ts = new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
+                //Updates the number of rows
                 this.countRows = this.ts.AmountLines();
                 return 0;
             }
@@ -170,17 +211,6 @@ namespace FlightSimADVProg2_ex1.Model
                 return -1;
 
             }
-
-            //this.fileCSV = PathFileCSV;
-            //string data = "";
-            //File.WriteAllText(this.fileCsvToWork, data);
-
-            //Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
-
-            //this.ts = new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
-            //this.countRows = this.ts.AmountLines();
-            //return 0;
-
         }
 
         /// <summary>This method return number of rows of csv file Without the first line of attribute</summary>
@@ -325,11 +355,11 @@ namespace FlightSimADVProg2_ex1.Model
 
 
         /// <summary>
-        /// Calculate the anomalies using dll functions for Circle
+        /// Calculate the anomalies using dll functions 
         /// </summary>
-        /// <param name="learnHibridCsv">A path of a file for learning the algorithm</param>
-        /// <returns>list of anomalies based off of circle (HAD)</returns>
-        public List<int> AnomalyAd(string learnHibridCsv)
+        /// <param name="learnCSV">A path of a file for learning the algorithm</param>
+        /// <returns>list of anomalies </returns>
+        public List<int> DetectAnomaly(string learnCSV)
         {
             if (this.fileCSV.Equals(""))
             {
@@ -338,26 +368,23 @@ namespace FlightSimADVProg2_ex1.Model
             }
             string learnHibridCsvToWork = "learnAdCsvToWork.csv";
             //create ts to learnNormalCsv
-            var lineCount = 0;
-            using (var reader = File.OpenText(learnHibridCsv))
-            {
-                while (reader.ReadLine() != null)
-                {
-                    lineCount++;
-                }
-            }
-
-
-
-
+            /* var lineCount = 0;
+             using (var reader = File.OpenText(learnCSV))
+             {
+                 while (reader.ReadLine() != null)
+                 {
+                     lineCount++;
+                 }
+             }*/
+            //Create a new file to work on
             string data = "";
             File.WriteAllText(learnHibridCsvToWork, data);
-
-            Scattering.AddFirstLineInCsv(learnHibridCsv, learnHibridCsvToWork, this.firstLine);
-
+            // Add the first row we created from the settings file while loading the csv
+            Scattering.AddFirstLineInCsv(learnCSV, learnHibridCsvToWork, this.firstLine);
+            //create timeseries
             TimeSeriesModel tsNormal = new TimeSeriesModel(learnHibridCsvToWork);
 
-            //create SimpleAnomalyDetector
+            //create AnomalyDetector
             AnomalyAd ad = new AnomalyAd();
 
 
@@ -370,16 +397,173 @@ namespace FlightSimADVProg2_ex1.Model
             ad.DestroyAnomaly();
             return l;
         }
+        /// <summary>
+        /// Returns the list of relative speeds from the dictionary
+        /// </summary>
+        /// <returns>list of relative speeds</returns>
         public List<float> GetListOfspeeds()
         {
 
             return new List<float>(this.speedToMillisecondAndRate.Keys);
+         
+        }
+
+        /// <summary>
+        /// Connects to flight gear using telnetClientFlightGear
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        public int Connect(string ip, int port)
+        {
+            this.ip = ip;
+            this.port = port;
+
+            this.telnetClientFlightGear.Connect(this.ip, this.port);
+            return 0;
+
+        }
+        /// <summary>
+        /// disconnect from flight gear
+        /// </summary>
+        public void Disconnect()
+        {
+            stop = true;
+            telnetClientFlightGear.Disconnect();
+        }
+        /// <summary>
+        /// Initiates a process by which it takes a line from the ts and sends
+        /// it to flight gear and updates all the fields accordingly
+        /// </summary>
+        public void start()
+        {
+           
+            //Check that the csv file is loaded
+            if (this.fileCSV.Equals(""))
+            {
+                Console.WriteLine("The appropriate files must be uploaded");
+                return;
+            }
+            //Test that we are connected to flight gear
+            //If we are not connected we will activate the start2 function
+            if (!this.telnetClientFlightGear.isConnected())
+            {
+                start2();
+                
+                return;
+            }
+            
+            //Change the stop
+            this.stop = false;
+            //Checking on which line we are in should not be an exception
+            if (IndexFrame >= this.countRows)
+            {
+                stop = true;
+
+            }
+            try
+            {
+                if (this.isStartWork == true)
+                {
+                    return;
+                }
+                //Creating a thread for parallel work with the model
+                //In order for both the functions of the model and the sender to work smoothly    
+                new Thread(delegate ()
+                {
+                    this.isStartWork = true;
+                    while (!stop)
+                    {
+                        string line;
+                        //Obtaining the relevant set of variables to index frame
+                        this.arrayRowNow = ts.TsGetRow(IndexFrame);
+                        // convert vectorFloat from dll to arrayFloat in c#
+                        this.updateAllattributes(arrayRowNow);
+                        line = String.Join(",", arrayRowNow);
+                        //add \r\n to send to flight gear
+                        line += "\r\n";
+                        //write to telnetClientFlightGear
+                        this.telnetClientFlightGear.Write(line);
+                        //Add 1 to the frame index
+                        IndexFrame++;
+                        //Adherence to the pace required by the user
+                        Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
+                        //Check if we have reached the end of the frames
+                        if (IndexFrame >= this.countRows)
+                        {
+                            stop = true;
+
+                        }
+                    }
+                    this.isStartWork = false;
+                }).Start();
+
+
+            }
+            catch (SocketException)
+            {
+                this.start2();
+            }
+          
+
+        }
+        /// <summary>
+        /// This function is just like the start function but without a socket connection
+        /// Used as a backup when the socket falls or is not connected and we still want to wash the app but without flight gear
+        /// </summary>
+        public void start2()
+        {
+            
+            if (this.fileCSV.Equals(""))
+            {
+                Console.WriteLine("The appropriate files must be uploaded");
+                return;
+            }
+            this.stop = false;
+            if (IndexFrame >= this.countRows)
+            {
+                stop = true;
+
+            }
+            if (this.isStartWork == true)
+            {
+                return;
+            }
+            new Thread(delegate ()
+            {
+                this.isStartWork = true;
+                while (!stop)
+                {
+
+
+                    this.arrayRowNow = ts.TsGetRow(IndexFrame);
+                    // convert vectorFloat from dll to arrayFloat in c#
+                    this.updateAllattributes(arrayRowNow);
+                    string line;
+                    line = String.Join(",", arrayRowNow);
+                    line += "\r\n";
+
+
+
+                    IndexFrame++;
+
+                    Thread.Sleep(this.millisecondsTimeout);// read the data in 4Hz
+
+                    if (IndexFrame >= this.countRows)
+                    {
+                        stop = true;
+
+                    }
+
+                }
+                this.isStartWork = false;
+
+
+            }).Start();
+
 
         }
 
-
     }
-
 
 }
 
