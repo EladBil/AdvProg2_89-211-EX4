@@ -12,6 +12,7 @@ and used by most of the class and has helped so far over 600 people!
 You can watch the turorial at this link https://www.youtube.com/watch?v=3efOjwKb9p4&t=910s
 
 Video explaining our project:
+
 Part 1: https://youtu.be/Xk6Z57QrCIU
 
 Part 2: https://youtu.be/libUHjocNaA
