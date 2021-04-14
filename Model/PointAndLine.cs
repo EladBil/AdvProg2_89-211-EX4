@@ -29,7 +29,7 @@ namespace FlightSimADVProg2_ex1.Model
 
 
 
-    class Line
+    public class Line
     {
 
         private float a, b;

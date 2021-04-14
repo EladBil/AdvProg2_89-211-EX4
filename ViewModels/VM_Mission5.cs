@@ -9,7 +9,7 @@ using FlightSimADVProg2_ex1.Model;
 
 namespace FlightSimADVProg2_ex1.ViewModels
 {
-    class VM_Mission5 : INotifyPropertyChanged
+    public class VM_Mission5 : INotifyPropertyChanged, IViewModel
     {
         private IModel model;
         public VM_Mission5(IModel model)
@@ -21,7 +21,11 @@ namespace FlightSimADVProg2_ex1.ViewModels
                 NotifyPropertyChanged("VM_" + e.PropertyName);
             };
         }
+
+
         public event PropertyChangedEventHandler PropertyChanged;
+        
+        
         public void NotifyPropertyChanged(string propName)
         {
             if (this.PropertyChanged != null)
@@ -29,6 +33,20 @@ namespace FlightSimADVProg2_ex1.ViewModels
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
             }
         }
+
+
+        public void Initialize()
+        {
+            // No need to do something extra.
+        }
+
+
+        public void StartAnimation()
+        {
+            // Starts automaticly when needed.
+        }
+
+
         //altimeter
         public float VM_AltimeterIndicatedAltitudeFt
         {
@@ -57,12 +75,13 @@ namespace FlightSimADVProg2_ex1.ViewModels
             } 
         }
         //roll deg
-        public double VM_RollDeg
+        public float VM_RollDeg
         {
-            get {return model.RollDeg; }
+            get {
+                return model.RollDeg; }
             set
             {
-                model.RollDeg = (float) value;
+                model.RollDeg = value;
             }
         }
         //yaw

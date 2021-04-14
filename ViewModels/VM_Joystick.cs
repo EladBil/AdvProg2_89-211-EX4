@@ -1,5 +1,5 @@
 ﻿/*
- * VM for loading API and flight CSV at start of the program
+ * VM Joystick
  */
 using System;
 using System.Collections.Generic;
@@ -9,10 +9,10 @@ using FlightSimADVProg2_ex1.Model;
 
 namespace FlightSimADVProg2_ex1.ViewModels
 {
-    class VM_Start : INotifyPropertyChanged
+    public class VM_Joystick : INotifyPropertyChanged, IViewModel
     {
         private IModel model;
-        public VM_Start(IModel model)
+        public VM_Joystick(IModel model)
         {
             this.model = model;
             model.PropertyChanged +=
@@ -29,21 +29,39 @@ namespace FlightSimADVProg2_ex1.ViewModels
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
             }
         }
-        //load the API upon start of program
-        private void VM_loadingAPI(string fileAPI)
+
+        public void Initialize()
         {
-            model.LoadingAPI(fileAPI);
+            throw new NotImplementedException();
         }
-        //load the CSV upon start of program
-        private void VM_LoadingCSV(string fileCSV)
+
+        public void StartAnimation()
         {
-            model.LoadingCSV(fileCSV);
+            throw new NotImplementedException();
         }
-        public void VM_LetsStart(string fileCSV, string fileAPI)
+
+        //returns the throttle_1
+        public double VM_Throttle1
         {
-            VM_loadingAPI(fileAPI);
-            VM_LoadingCSV(fileCSV);
-            model.start();
+            get { return model.Throttle_1; }
+            set { }
+        }
+        public double VM_Throttle2
+        {
+            get { return model.Throttle_2; }
+        }
+        public double VM_Rudder
+        {
+            get { return model.Rudder; }
+            set { }
+        }
+        public double VM_Aileron
+        {
+            get { return model.Aileron; }
+        }
+        public double VM_Elevator
+        {
+            get { return model.Elevator; }
         }
     }
 }

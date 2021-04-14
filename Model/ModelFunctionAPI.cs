@@ -12,7 +12,6 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 
 namespace FlightSimADVProg2_ex1.Model
 {
@@ -26,7 +25,7 @@ namespace FlightSimADVProg2_ex1.Model
         public int MiliSeconds { get; set; }
         public int Rate { get; set; }
 
-       
+
     }
     partial class MyModel : IModel
     {
@@ -55,7 +54,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// Will hold the api file name
         /// </summary>
         private string fileAPI = "";
-
+        private string fileCSV = "";
         /// <summary>
         /// Holds the number of rows (without the attribute names) of the csv file
         /// </summary>
@@ -63,7 +62,17 @@ namespace FlightSimADVProg2_ex1.Model
         /// <summary>
         /// Holds the IP of the flight gear
         /// </summary>
-        private string ip = "";
+        private string ip = "127.0.0.1";
+
+
+        public string IP
+        {
+            get { return this.ip; }
+            set
+            {
+                this.ip = new string(value);
+            }
+        }
         /// <summary>
         /// Holds the port of the flight gear
         /// </summary>
@@ -91,8 +100,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         private TimeSeriesModel ts;
 
-       
-      
+
 
 
 
@@ -102,13 +110,31 @@ namespace FlightSimADVProg2_ex1.Model
         ///
         public int LoadingAPI(string pathFileAPI)
         {
-            this.fileAPI = pathFileAPI;
-            this.firstLine = Scattering.CreatestringOfValues(pathFileAPI);
-            this.DictValuesToNumInCsv = new Dictionary<string, int>();
+            try
+            {
+                this.fileAPI = pathFileAPI;
+                this.firstLine = Scattering.CreatestringOfValues(pathFileAPI);
+                this.DictValuesToNumInCsv = new Dictionary<string, int>();
 
-            this.firstLine = Scattering.CreateDictionaryFromStringCSV(this.DictValuesToNumInCsv, this.firstLine);
+                this.firstLine = Scattering.CreateDictionaryFromStringCSV(this.DictValuesToNumInCsv, this.firstLine);
+            }
+            catch
+            {
+                Console.WriteLine("Failed to load API file");
+                this.fileAPI = "";
+                return -1;
+            }
 
             return 0;
+
+            //this.fileAPI = pathFileAPI;
+            //this.firstLine = Scattering.CreatestringOfValues(pathFileAPI);
+            //this.DictValuesToNumInCsv = new Dictionary<string, int>();
+
+            //this.firstLine = Scattering.CreateDictionaryFromStringCSV(this.DictValuesToNumInCsv, this.firstLine);
+
+
+            //return 0;
         }
         /// <summary>
         /// Upload a csv file to explore
@@ -120,17 +146,42 @@ namespace FlightSimADVProg2_ex1.Model
         /// </returns>
         public int LoadingCSV(string PathFileCSV)
         {
+            if (this.fileAPI.Equals(""))
+            {
+                Console.WriteLine("An API file must be uploaded");
+                return -1;
+            }
+            try
+            {
+                this.fileCSV = PathFileCSV;
+                string data = "";
+                File.WriteAllText(this.fileCsvToWork, data);
 
-            string data = "";
-            File.WriteAllText(this.fileCsvToWork, data);
+                Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
 
-            Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
+                this.ts = new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
+                this.countRows = this.ts.AmountLines();
+                return 0;
+            }
+            catch
+            {
+                this.fileCSV = "";
+                Console.WriteLine("Failed to load csv file");
+                return -1;
 
-            this.ts = new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
-            this.countRows = this.ts.AmountLines();
-            return 0;
+            }
+
+            //this.fileCSV = PathFileCSV;
+            //string data = "";
+            //File.WriteAllText(this.fileCsvToWork, data);
+
+            //Scattering.AddFirstLineInCsv(PathFileCSV, this.fileCsvToWork, this.firstLine);
+
+            //this.ts = new TimeSeriesModel(this.fileCsvToWork);//ticreateTS(this.fileCsvToWork);
+            //this.countRows = this.ts.AmountLines();
+            //return 0;
+
         }
-
 
         /// <summary>This method return number of rows of csv file Without the first line of attribute</summary>
         ///<returns>number of rows of csv file Without the first line of attribute</returns>
@@ -280,7 +331,11 @@ namespace FlightSimADVProg2_ex1.Model
         /// <returns>list of anomalies based off of circle (HAD)</returns>
         public List<int> AnomalyAd(string learnHibridCsv)
         {
-
+            if (this.fileCSV.Equals(""))
+            {
+                Console.WriteLine("The appropriate files must be uploaded to boot the model");
+                return new List<int>();
+            }
             string learnHibridCsvToWork = "learnAdCsvToWork.csv";
             //create ts to learnNormalCsv
             var lineCount = 0;
@@ -315,11 +370,16 @@ namespace FlightSimADVProg2_ex1.Model
             ad.DestroyAnomaly();
             return l;
         }
+        public List<float> GetListOfspeeds()
+        {
 
+            return new List<float>(this.speedToMillisecondAndRate.Keys);
 
+        }
 
 
     }
+
 
 }
 

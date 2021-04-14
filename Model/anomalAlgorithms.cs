@@ -16,7 +16,7 @@ namespace FlightSimADVProg2_ex1.Model
 
     class AnomalyAd : IAnomalAlgorithms
     {
-        const string myDll = "SadDLL.dll";
+        const string myDll = "HadDLL.dll";
 
         [DllImport(myDll)]
         public static extern IntPtr createAd();

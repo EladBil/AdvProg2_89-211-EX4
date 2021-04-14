@@ -5,9 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FlightSimADVProg2_ex1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
-        xmlns:controls="clr-namespace:FlightSimADVProg2_ex1.SubViews">
+        Title="MainWindow" Height="720" Width="1024"
+        xmlns:controls1="clr-namespace:FlightSimADVProg2_ex1.SubViews"
+        xmlns:controls2="clr-namespace:DrawingDLL;assembly=DrawingDLL">
     <Grid>
-        <controls:GroundRelativeView/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="7*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="12*"/>
+        </Grid.RowDefinitions>
+        <controls1:Joystick x:Name="JoystickView" Grid.Column="0" Grid.Row="2"/>
+        <controls1:GroundRelativeView x:Name="GroundRelativeView" Grid.Row="1" Grid.Column="0" Loaded="GroundRelativeView_Loaded"/>
+        <controls1:GraphsView Loaded="GraphsView_Loaded" x:Name="GraphsView" Grid.Row="2" Grid.Column="1"/>
+        <controls1:PlaybackView x:Name="PlaybackControlView" Grid.Row="0"/>
+
+        <controls2:UserControl1 x:Name="AnomalyDetectionView" Grid.Column="1" Grid.RowSpan="2"/>
+
     </Grid>
 </Window>

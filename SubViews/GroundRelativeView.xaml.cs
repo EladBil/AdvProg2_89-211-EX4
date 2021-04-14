@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Diagnostics;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -21,19 +22,35 @@ namespace FlightSimADVProg2_ex1.SubViews
     /// </summary>
     public partial class GroundRelativeView : UserControl
     {
-        VM_Mission5 vm5;
-        VM_Start vmstart;
+
+        private bool onlyonce = true;
 
         public GroundRelativeView()
         {
             InitializeComponent();
-            MyModel mm = new MyModel(new MyTelnetFlightGearClientUDP());
-            vmstart = new VM_Start(mm);
-            vmstart.VM_LetsStart("reg_flight.csv", "playback_small.xml");
-            vm5 = new VM_Mission5(mm);
-           
-            DataContext = vm5;
         }
+
+
+        private VM_Mission5 grvm;
+        public VM_Mission5 GivenGroundRelativeViewModel
+        {
+            get { return grvm; }
+            set 
+            {
+                grvm = value;
+                if (onlyonce)
+                {
+                    onlyonce = false;
+                    InitSequence();
+                }
+            }
+        }
+
+        private void InitSequence()
+        {
+            DataContext = grvm;
+        }
+
 
         private void VelocityValue_TextChanged(object sender, TextChangedEventArgs e)
         {
