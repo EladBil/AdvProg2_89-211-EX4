@@ -11,6 +11,10 @@ a video explaining how to create a C++ dll to use in C# that was viewed
 and used by most of the class and has helped so far over 600 people! 
 You can watch the turorial at this link https://www.youtube.com/watch?v=3efOjwKb9p4&t=910s
 
+Video explaining our project:
+Part 1: https://youtu.be/Xk6Z57QrCIU
+Part 2: https://youtu.be/libUHjocNaA
+
 Operating Instructions:
 
 1. Download and Install the flight gear app from https://www.flightgear.org/
@@ -28,12 +32,10 @@ Explanation: playback_small - The name of the settings file without it's extensi
 
 Recommendation: After running the application, the port of the flight gear may be caught and actions must be taken to release him.
 
-4. The folder must be extracted    "FlightSimADVProg2_ex1.zip"
+4. The following folder must be extracted    "FlightSimADVProg2_ex1.zip"
 
-Enter to folder netcoreapp3.1 in   "FlightSimADVProg2_ex1\FlightSimADVProg2_ex1\bin\x86\Debug\netcoreapp3.1"
-You can insert the dll into this folder
-and additional files
-When you have finished preparing, click on the file  "FlightSimADVProg2_ex1.exe"
+Go to the directory netcoreapp3.1 in   "FlightSimADVProg2_ex1\FlightSimADVProg2_ex1\bin\x86\Debug\netcoreapp3.1"
+You can insert the dll into this folder and additional files
 
 5. Instructions for loading dll
 The following dll files must be placed in the folder of the app's executable. 
@@ -42,16 +44,19 @@ The following dll files must be placed in the folder of the app's executable.
 5.2.1. A function: CallDraw(double[] x, double[] y, int[] z, int w) 
 5.2.1. The xaml class of the DLL must be called "UserControl1"
 
+7.When you have finished preparing, click on the file  "FlightSimADVProg2_ex1.exe"
+
+
 After the app has uploaded
-6.Enter the path of the xml file in the appropriate place 
+8.Enter the path of the xml file in the appropriate place 
 
-7.Enter the path of flight data file that you want to explore in the appropriate place 
+9.Enter the path of flight data file that you want to explore in the appropriate place 
 
-8.Enter the path of flight data file that you want the anomaly detection system to learn to make a comparison in the appropriate place 
+10.Enter the path of flight data file that you want the anomaly detection system to learn to make a comparison in the appropriate place 
 
-9.Press start
+11.Press start
 
-10.The app will begin to run and display the Flight Gear and all 
+12.The app will begin to run and display the Flight Gear and all 
 
 About the design:
 
