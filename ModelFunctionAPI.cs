@@ -140,7 +140,7 @@ namespace FlightSimADVProg2_ex1.Model
 
         }
 
-
+       
 
         /// <summary>This method uppload file API and create dictionary 
         /// Which maps between values and numbers.
@@ -436,6 +436,7 @@ namespace FlightSimADVProg2_ex1.Model
         /// </summary>
         public void start()
         {
+           
             //Check that the csv file is loaded
             if (this.fileCSV.Equals(""))
             {
@@ -447,8 +448,10 @@ namespace FlightSimADVProg2_ex1.Model
             if (!this.telnetClientFlightGear.isConnected())
             {
                 start2();
+                
                 return;
             }
+            
             //Change the stop
             this.stop = false;
             //Checking on which line we are in should not be an exception
@@ -459,12 +462,15 @@ namespace FlightSimADVProg2_ex1.Model
             }
             try
             {
-
+                if (this.isStartWork == true)
+                {
+                    return;
+                }
                 //Creating a thread for parallel work with the model
                 //In order for both the functions of the model and the sender to work smoothly    
                 new Thread(delegate ()
                 {
-
+                    this.isStartWork = true;
                     while (!stop)
                     {
                         string line;
@@ -488,7 +494,7 @@ namespace FlightSimADVProg2_ex1.Model
 
                         }
                     }
-
+                    this.isStartWork = false;
                 }).Start();
 
 
@@ -497,7 +503,7 @@ namespace FlightSimADVProg2_ex1.Model
             {
                 this.start2();
             }
-
+          
 
         }
         /// <summary>
@@ -518,8 +524,13 @@ namespace FlightSimADVProg2_ex1.Model
                 stop = true;
 
             }
+            if (this.isStartWork == true)
+            {
+                return;
+            }
             new Thread(delegate ()
             {
+                this.isStartWork = true;
                 while (!stop)
                 {
 
@@ -544,7 +555,7 @@ namespace FlightSimADVProg2_ex1.Model
                     }
 
                 }
-               
+                this.isStartWork = false;
 
 
             }).Start();
